@@ -129,7 +129,7 @@ juris-banking-settlement-payment-automation/
 │       └── i18n/              # Localized strings (en, es, zh, vi)
 ├── fixtures/mock-sftp/        # Built-in ssh2 mock SFTP daemon for Dash testing
 ├── storage/                   # Spooling directories for SFTP and emails
-├── docs/                      # Comprehensive in-tree milestone specifications
+├── docs/                      # User training guides, video workflows, and media assets
 └── tests/e2e/                 # 84-test master end-to-end acceptance runner
 ```
 

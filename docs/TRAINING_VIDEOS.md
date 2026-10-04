@@ -190,6 +190,6 @@ The pipeline executes the following two-stage pipeline:
 ## 📞 Administrative Support & Inquiries
 
 For technical assistance, workflow customization, or API integrations, refer to:
-- Technical Documentation: [`docs/milestone_1_rbac.md`](file:///home/robert/projects/juris-banking/docs/milestone_1_rbac.md) through [`docs/milestone_6_final_hardening.md`](file:///home/robert/projects/juris-banking/docs/milestone_6_final_hardening.md)
+- Technical Documentation & User Guides: [`README.md`](file:///home/robert/projects/juris-banking/README.md)
 - Commercial Licensing & Inquiries: [`LICENSE`](file:///home/robert/projects/juris-banking/LICENSE)
 - Lead Architect: Robert Baindourov (`rbaindourov@gmail.com`)
