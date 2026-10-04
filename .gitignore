@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Storage directories
+storage/sftp/outbox/*
+!storage/sftp/outbox/.gitkeep
+storage/sftp/inbox/*
+!storage/sftp/inbox/.gitkeep
+storage/emails/*
+!storage/emails/.gitkeep
+server/storage/
+storage/mock-sftp-server/
+
+# Coverage and test artifacts
+coverage/
+
+# Video capture raw recordings
+docs/videos/raw/
+docs/videos/posters/test_*
+
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Agent metadata
+.agents/
+

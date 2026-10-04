@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Build & Test Battery
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 20.x, 22.x ]
+        mongodb-version: [ '7.0' ]
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: |
+          npm ci
+          cd server && npm ci
+          cd ../client && npm ci
+
+      - name: Compile & Build Assets
+        run: |
+          npm run build
+
+      - name: Run Backend Unit & Integration Tests (545 Tests)
+        run: |
+          cd server
+          npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI_TEST: mongodb://localhost:27017/juris_banking_test
+          JWT_SECRET: ci_test_secret_key_at_least_32_characters_long_12345
+          COOKIE_SECRET: ci_cookie_secret_key_at_least_32_characters_long_12345
+
+      - name: Run Master End-to-End Acceptance Tests (84 Tests)
+        run: |
+          npm run test:e2e
+        env:
+          NODE_ENV: test
+          MONGODB_URI_TEST: mongodb://localhost:27017/juris_banking_test
+          JWT_SECRET: ci_test_secret_key_at_least_32_characters_long_12345
+          COOKIE_SECRET: ci_cookie_secret_key_at_least_32_characters_long_12345

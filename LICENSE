@@ -1,0 +1,54 @@
+JurisBanking Commercial Source-Available License (Version 1.0)
+Copyright (c) 2026 Robert Baindourov <rbaindourov@gmail.com>. All Rights Reserved.
+
+================================================================================
+1. DEFINITIONS
+================================================================================
+"Software" refers to the JurisBanking Settlement Payment Automation system, including all source code, models, controllers, view components, templates, schemas, scripts, tests, and documentation contained in this repository.
+
+"Licensor" refers exclusively to Robert Baindourov.
+
+"Commercial Use" refers to any use, execution, or deployment of the Software (or any derivative work) that is intended for or directed towards commercial advantage, monetary compensation, revenue generation, business operations, or paid services. This includes, without limitation:
+  (a) Administering, processing, or facilitating any legal settlement, class-action disbursement, fund allocation, or escrow payout for clients or third parties;
+  (b) Offering the Software as a hosted service, Software-as-a-Service (SaaS), API, or managed platform;
+  (c) Charging any fee, commission, percentage, administration fee, or retainer in connection with the Software;
+  (d) Utilizing the Software within any for-profit law firm, claims administration company, financial institution, or commercial business operations.
+
+================================================================================
+2. PERMITTED NON-COMMERCIAL & EVALUATION USE
+================================================================================
+Subject to the terms and restrictions herein, the Licensor hereby grants you a personal, non-exclusive, non-transferable, royalty-free license to:
+  (a) View, inspect, download, and compile the source code;
+  (b) Execute the Software strictly for personal evaluation, private non-production testing, and academic or educational research.
+
+================================================================================
+3. STRICT COMMERCIAL LICENSE REQUIREMENT (MANDATORY PAID AGREEMENT)
+================================================================================
+YOU ARE STRICTLY PROHIBITED FROM ENGAGING IN ANY COMMERCIAL USE OF THE SOFTWARE WITHOUT FIRST ENTERING INTO A SIGNED, PAID COMMERCIAL LICENSE AGREEMENT WITH THE LICENSOR.
+
+ANY COMMERCIAL USE, PRODUCTION DEPLOYMENT, OR REVENUE-GENERATING DISBURSEMENT WITHOUT AN ACTIVE, EXECUTED COMMERCIAL LICENSE FROM ROBERT BAINDOUROV CONSTITUTES WILLFUL COPYRIGHT INFRINGEMENT UNDER APPLICABLE UNITED STATES AND INTERNATIONAL LAWS, SUBJECTING THE INFRINGER TO STATUTORY DAMAGES, INJUNCTIVE RELIEF, AND ATTORNEY'S FEES.
+
+================================================================================
+4. PERMANENCE (ZERO CHANGE DATE / NO AUTOMATIC CONVERSION)
+================================================================================
+THIS LICENSE IS PERPETUAL AND FINAL. IT DOES NOT CONTAIN A CHANGE DATE, SUNSET CLAUSE, OR CONVERSION PROVISION. IT SHALL NEVER AUTOMATICALLY CONVERT INTO AN OPEN-SOURCE, PUBLIC DOMAIN, OR COPYLEFT LICENSE (SUCH AS MIT, APACHE, BSL, OR GPL). THE LICENSOR RETAINS FULL EXCLUSIVE COMMERCIAL RIGHTS PERPETUALLY.
+
+================================================================================
+5. COMMERCIAL LICENSING INQUIRIES
+================================================================================
+To obtain a Paid Commercial License, negotiated case-by-case disbursement terms, enterprise deployment rights, or commercial hosting authorization, contact:
+
+  Robert Baindourov
+  Email: rbaindourov@gmail.com
+
+================================================================================
+6. ATTRIBUTION REQUIREMENT
+================================================================================
+Any deployment of the Software must maintain all original copyright notices and conspicuously display:
+"Powered by JurisBanking — Created by Robert Baindourov"
+in all legal disclaimers, claimant portal footers, and administrative interfaces.
+
+================================================================================
+7. DISCLAIMER OF WARRANTIES & LIMITATION OF LIABILITY
+================================================================================
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

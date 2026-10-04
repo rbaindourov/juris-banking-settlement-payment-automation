@@ -1,0 +1,51 @@
+Claim ID,First Name,Last Name,Email,Phone,Address 1,Address 2,City,State,ZIP Code,Settlement Amount
+CLM-INGEST-000001,"Mary","Johnson",mary.johnson.1@example-claimant.com,+12000000001,"107 Maple Avenue","","San Francisco",CA,94102,450.00
+CLM-INGEST-000002,"Robert","Williams",robert.williams.2@example-claimant.com,+12000000002,"114 Cedar Lane","","New York",NY,10001,450.00
+CLM-INGEST-000003,"Patricia","Brown",patricia.brown.3@example-claimant.com,+12000000003,"121 Pine Road","","Chicago",IL,60601,450.00
+CLM-INGEST-000004,"John","Jones",john.jones.4@example-claimant.com,+12000000004,"128 Elm Street","","Houston",TX,77001,450.00
+CLM-INGEST-000005,"Jennifer","Garcia",jennifer.garcia.5@example-claimant.com,+12000000005,"135 Washington Boulevard","Apt 105","Miami",FL,33101,450.00
+CLM-INGEST-000006,"Michael","Miller",michael.miller.6@example-claimant.com,+12000000006,"142 Lakeview Drive","","Seattle",WA,98101,450.00
+CLM-INGEST-000007,"Linda","Davis",linda.davis.7@example-claimant.com,+12000000007,"149 Park Avenue","","Denver",CO,80201,450.00
+CLM-INGEST-000008,"David","Rodriguez",david.rodriguez.8@example-claimant.com,+12000000008,"156 Sunset Boulevard","","Los Angeles",CA,90001,450.00
+CLM-INGEST-000009,"Elizabeth","Martinez",elizabeth.martinez.9@example-claimant.com,+12000000009,"163 Highland Drive","","San Francisco",CA,94102,450.00
+CLM-INGEST-000010,"William","Hernandez",william.hernandez.10@example-claimant.com,+12000000010,"170 Oak Street","Apt 110","New York",NY,10001,450.00
+CLM-INGEST-000011,"Barbara","Lopez",barbara.lopez.11@example-claimant.com,+12000000011,"177 Maple Avenue","","Chicago",IL,60601,450.00
+CLM-INGEST-000012,"Richard","Gonzalez",richard.gonzalez.12@example-claimant.com,+12000000012,"184 Cedar Lane","","Houston",TX,77001,450.00
+CLM-INGEST-000013,"Susan","Wilson",susan.wilson.13@example-claimant.com,+12000000013,"191 Pine Road","","Miami",FL,33101,450.00
+CLM-INGEST-000014,"Joseph","Anderson",joseph.anderson.14@example-claimant.com,+12000000014,"198 Elm Street","","Seattle",WA,98101,450.00
+CLM-INGEST-000015,"Jessica","Thomas",jessica.thomas.15@example-claimant.com,+12000000015,"205 Washington Boulevard","Apt 115","Denver",CO,80201,450.00
+CLM-INGEST-000016,"Thomas","Taylor",thomas.taylor.16@example-claimant.com,+12000000016,"212 Lakeview Drive","","Los Angeles",CA,90001,450.00
+CLM-INGEST-000017,"Sarah","Moore",sarah.moore.17@example-claimant.com,+12000000017,"219 Park Avenue","","San Francisco",CA,94102,450.00
+CLM-INGEST-000018,"Charles","Jackson",charles.jackson.18@example-claimant.com,+12000000018,"226 Sunset Boulevard","","New York",NY,10001,450.00
+CLM-INGEST-000019,"Karen","Martin",karen.martin.19@example-claimant.com,+12000000019,"233 Highland Drive","","Chicago",IL,60601,450.00
+CLM-INGEST-000020,"Christopher","Lee",christopher.lee.20@example-claimant.com,+12000000020,"240 Oak Street","Apt 120","Houston",TX,77001,450.00
+CLM-INGEST-000021,"Nancy","Perez",nancy.perez.21@example-claimant.com,+12000000021,"247 Maple Avenue","","Miami",FL,33101,450.00
+CLM-INGEST-000022,"Daniel","Thompson",daniel.thompson.22@example-claimant.com,+12000000022,"254 Cedar Lane","","Seattle",WA,98101,450.00
+CLM-INGEST-000023,"Lisa","White",lisa.white.23@example-claimant.com,+12000000023,"261 Pine Road","","Denver",CO,80201,450.00
+CLM-INGEST-000024,"Matthew","Smith",matthew.smith.24@example-claimant.com,+12000000024,"268 Elm Street","","Los Angeles",CA,90001,450.00
+CLM-INGEST-000025,"Betty","Johnson",betty.johnson.25@example-claimant.com,+12000000025,"275 Washington Boulevard","Apt 125","San Francisco",CA,94102,450.00
+CLM-INGEST-000026,"Anthony","Williams",anthony.williams.26@example-claimant.com,+12000000026,"282 Lakeview Drive","","New York",NY,10001,450.00
+CLM-INGEST-000027,"Margaret","Brown",margaret.brown.27@example-claimant.com,+12000000027,"289 Park Avenue","","Chicago",IL,60601,450.00
+CLM-INGEST-000028,"Mark","Jones",mark.jones.28@example-claimant.com,+12000000028,"296 Sunset Boulevard","","Houston",TX,77001,450.00
+CLM-INGEST-000029,"Sandra","Garcia",sandra.garcia.29@example-claimant.com,+12000000029,"303 Highland Drive","","Miami",FL,33101,450.00
+CLM-INGEST-000030,"Donald","Miller",donald.miller.30@example-claimant.com,+12000000030,"310 Oak Street","Apt 130","Seattle",WA,98101,450.00
+CLM-INGEST-000031,"Ashley","Davis",ashley.davis.31@example-claimant.com,+12000000031,"317 Maple Avenue","","Denver",CO,80201,450.00
+CLM-INGEST-000032,"James","Rodriguez",james.rodriguez.32@example-claimant.com,+12000000032,"324 Cedar Lane","","Los Angeles",CA,90001,450.00
+CLM-INGEST-000033,"Mary","Martinez",mary.martinez.33@example-claimant.com,+12000000033,"331 Pine Road","","San Francisco",CA,94102,450.00
+CLM-INGEST-000034,"Robert","Hernandez",robert.hernandez.34@example-claimant.com,+12000000034,"338 Elm Street","","New York",NY,10001,450.00
+CLM-INGEST-000035,"Patricia","Lopez",patricia.lopez.35@example-claimant.com,+12000000035,"345 Washington Boulevard","Apt 135","Chicago",IL,60601,450.00
+CLM-INGEST-000036,"John","Gonzalez",john.gonzalez.36@example-claimant.com,+12000000036,"352 Lakeview Drive","","Houston",TX,77001,450.00
+CLM-INGEST-000037,"Jennifer","Wilson",jennifer.wilson.37@example-claimant.com,+12000000037,"359 Park Avenue","","Miami",FL,33101,450.00
+CLM-INGEST-000038,"Michael","Anderson",michael.anderson.38@example-claimant.com,+12000000038,"366 Sunset Boulevard","","Seattle",WA,98101,450.00
+CLM-INGEST-000039,"Linda","Thomas",linda.thomas.39@example-claimant.com,+12000000039,"373 Highland Drive","","Denver",CO,80201,450.00
+CLM-INGEST-000040,"David","Taylor",david.taylor.40@example-claimant.com,+12000000040,"380 Oak Street","Apt 140","Los Angeles",CA,90001,450.00
+CLM-INGEST-000041,"Elizabeth","Moore",elizabeth.moore.41@example-claimant.com,+12000000041,"387 Maple Avenue","","San Francisco",CA,94102,450.00
+CLM-INGEST-000042,"William","Jackson",william.jackson.42@example-claimant.com,+12000000042,"394 Cedar Lane","","New York",NY,10001,450.00
+CLM-INGEST-000043,"Barbara","Martin",barbara.martin.43@example-claimant.com,+12000000043,"401 Pine Road","","Chicago",IL,60601,450.00
+CLM-INGEST-000044,"Richard","Lee",richard.lee.44@example-claimant.com,+12000000044,"408 Elm Street","","Houston",TX,77001,450.00
+CLM-INGEST-000045,"Susan","Perez",susan.perez.45@example-claimant.com,+12000000045,"415 Washington Boulevard","Apt 145","Miami",FL,33101,450.00
+CLM-INGEST-000046,"Joseph","Thompson",joseph.thompson.46@example-claimant.com,+12000000046,"422 Lakeview Drive","","Seattle",WA,98101,450.00
+CLM-INGEST-000047,"Jessica","White",jessica.white.47@example-claimant.com,+12000000047,"429 Park Avenue","","Denver",CO,80201,450.00
+CLM-INGEST-000048,"Thomas","Smith",thomas.smith.48@example-claimant.com,+12000000048,"436 Sunset Boulevard","","Los Angeles",CA,90001,450.00
+CLM-INGEST-000049,"Sarah","Johnson",sarah.johnson.49@example-claimant.com,+12000000049,"443 Highland Drive","","San Francisco",CA,94102,450.00
+CLM-INGEST-000050,"Charles","Williams",charles.williams.50@example-claimant.com,+12000000050,"450 Oak Street","Apt 150","New York",NY,10001,450.00
