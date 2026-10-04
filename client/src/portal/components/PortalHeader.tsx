@@ -21,16 +21,20 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
 }) => {
   return (
     <header
+      role="banner"
       style={{
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e2e8f0',
-        padding: '16px 24px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        borderBottom: '1px solid var(--border-subtle)',
+        padding: '16px 28px',
+        boxShadow: 'var(--shadow-xs)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40
       }}
     >
       <div
         style={{
-          maxWidth: '1000px',
+          maxWidth: '1080px',
           margin: '0 auto',
           display: 'flex',
           flexWrap: 'wrap',
@@ -40,51 +44,55 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
         }}
       >
         {/* Left: Branding & Case Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              backgroundColor: '#1e3a8a',
+              width: '42px',
+              height: '42px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--color-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
+              boxShadow: '0 2px 6px rgba(30, 58, 138, 0.25)',
               flexShrink: 0
             }}
           >
-            <ShieldCheck size={24} />
+            <ShieldCheck size={24} aria-hidden="true" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
+              <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                 {caseData.name || caseData.caseName || 'Settlement Administration'}
               </span>
               {caseData.docketNumber && (
                 <span
                   style={{
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: '#f1f5f9',
-                    color: '#475569',
-                    border: '1px solid #cbd5e1'
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                    padding: '3px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-card-subtle)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border-default)'
                   }}
                 >
                   Docket: {caseData.docketNumber}
                 </span>
               )}
             </div>
-            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
-              Official Court-Authorized Settlement Payment Portal &bull; Juris Banking
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>&bull; Verified Court-Authorized Portal</span>
+              <span>&bull;</span>
+              <span>Juris Banking Settlement Administration</span>
             </div>
           </div>
         </div>
 
-        {/* Right: Controls & Timer */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Right: Countdown Timer & Language Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <CountdownTimer deadline={disbursementDeadline} onExpire={onExpire} />
           <LanguageSwitcher
             currentLang={currentLang}

@@ -63,111 +63,112 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
 
   return (
     <div
+      className="fintech-card"
+      role="region"
+      aria-label="Official Settlement Payment Receipt"
       style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        padding: '32px',
-        maxWidth: '760px',
+        padding: '36px',
+        maxWidth: '780px',
         margin: '0 auto',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        boxShadow: 'var(--shadow-md)'
       }}
     >
       {/* Top Banner */}
       <div style={{ textAlign: 'center', marginBottom: '28px' }}>
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: '#ecfdf5',
-            color: '#059669',
+            width: '60px',
+            height: '60px',
+            borderRadius: 'var(--radius-full)',
+            backgroundColor: 'var(--color-success-bg)',
+            color: 'var(--color-success)',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '12px'
+            marginBottom: '14px',
+            boxShadow: '0 2px 6px rgba(5, 150, 105, 0.2)'
           }}
         >
-          <CheckCircle2 size={32} />
+          <CheckCircle2 size={32} aria-hidden="true" />
         </div>
-        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
           {t('receiptTitle')}
         </h2>
         <div
           style={{
             display: 'inline-block',
-            padding: '6px 14px',
-            borderRadius: '6px',
-            backgroundColor: '#f1f5f9',
-            border: '1px solid #cbd5e1',
-            fontFamily: 'monospace',
+            padding: '6px 16px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--bg-active)',
+            border: '1px solid #bfdbfe',
+            fontFamily: 'var(--font-mono)',
             fontSize: '16px',
-            fontWeight: 700,
-            color: '#1e3a8a'
+            fontWeight: 800,
+            color: 'var(--color-indigo)'
           }}
         >
-          {receipt.confirmationNumber}
+          Confirmation: {receipt.confirmationNumber}
         </div>
       </div>
 
       {/* Grid of Confirmed Data */}
       <div
         style={{
-          borderTop: '1px solid #e2e8f0',
-          borderBottom: '1px solid #e2e8f0',
-          padding: '20px 0',
+          borderTop: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--border-subtle)',
+          padding: '24px 0',
           marginBottom: '24px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '16px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '20px'
         }}
       >
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Claimant Name</div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>{receipt.claimantName}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Claimant Name</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>{receipt.claimantName}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Claim ID</div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', fontFamily: 'monospace' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Claim ID</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
             {receipt.claimId}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Case Name</div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>{receipt.caseName}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Case Matter</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>{receipt.caseName}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Docket Number</div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>{receipt.docketNumber}</div>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Court Docket</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{receipt.docketNumber}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Confirmed Settlement Amount</div>
-          <div style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>
+          <div style={{ fontSize: '11px', color: 'var(--color-success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Confirmed Settlement Award</div>
+          <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-success-text)', fontVariantNumeric: 'tabular-nums', marginTop: '2px' }}>
             {receipt.formattedAmount || `$${receipt.amount.toFixed(2)}`}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Selected Payment Method</div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#1e3a8a' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Selected Payment Method</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-indigo)', marginTop: '2px' }}>
             {receipt.selectedMethod.toUpperCase()}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Submission Timestamp</div>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Submission Timestamp</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginTop: '2px' }}>
             {new Date(receipt.timestamp).toLocaleString('en-US')}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Digital Signature</div>
-          <div style={{ fontSize: '15px', fontWeight: 600, fontStyle: 'italic', color: '#1e293b' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Digital Signature</div>
+          <div style={{ fontSize: '15px', fontWeight: 600, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: 'var(--text-primary)', marginTop: '2px' }}>
             {receipt.digitalSignature}
           </div>
         </div>
@@ -177,64 +178,44 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
       <div
         style={{
           display: 'flex',
-          gap: '10px',
+          gap: '12px',
           alignItems: 'center',
-          backgroundColor: '#f8fafc',
-          padding: '12px 16px',
-          borderRadius: '8px',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--bg-card-subtle)',
+          padding: '14px 18px',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-subtle)',
           fontSize: '12px',
-          color: '#64748b',
+          color: 'var(--text-muted)',
           marginBottom: '28px'
         }}
       >
-        <ShieldCheck size={18} color="#059669" style={{ flexShrink: 0 }} />
+        <ShieldCheck size={20} color="var(--color-success)" style={{ flexShrink: 0 }} aria-hidden="true" />
         <div>
-          Forensic Audit Reference: Recorded from client IP <strong>{receipt.ipAddress}</strong>. Certified under 28 U.S.C. § 1746.
+          Forensic Audit Record: Captured from client IP <strong>{receipt.ipAddress}</strong> under penalty of perjury pursuant to 28 U.S.C. § 1746. Verified and recorded by Juris Banking Settlement Platform.
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           type="button"
           onClick={handlePrint}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: '6px',
-            backgroundColor: '#1e3a8a',
-            color: '#ffffff',
-            border: 'none',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
+          aria-label="Print official receipt"
+          className="btn-primary"
+          style={{ padding: '10px 20px' }}
         >
-          <Printer size={16} />
+          <Printer size={16} aria-hidden="true" />
           <span>{t('printReceipt')}</span>
         </button>
 
         <button
           type="button"
           onClick={handleDownload}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            borderRadius: '6px',
-            backgroundColor: '#f1f5f9',
-            color: '#334155',
-            border: '1px solid #cbd5e1',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
+          aria-label="Download official receipt as HTML"
+          className="btn-secondary"
+          style={{ padding: '10px 20px' }}
         >
-          <Download size={16} />
+          <Download size={16} aria-hidden="true" />
           <span>{t('downloadReceipt')}</span>
         </button>
 
@@ -243,13 +224,13 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
             type="button"
             onClick={onBackToPortal}
             style={{
-              padding: '10px 18px',
-              borderRadius: '6px',
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-md)',
               backgroundColor: 'transparent',
-              color: '#64748b',
+              color: 'var(--text-muted)',
               border: 'none',
               fontSize: '14px',
-              fontWeight: 500,
+              fontWeight: 600,
               cursor: 'pointer'
             }}
           >

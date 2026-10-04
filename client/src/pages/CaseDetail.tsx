@@ -141,75 +141,84 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '32px 24px' }}>
       {/* Back button */}
       <button
         type="button"
         onClick={onBack}
+        aria-label="Return to Settlement Case Registry"
         style={{
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '8px',
           background: 'none',
           border: 'none',
-          color: '#64748b',
+          color: 'var(--text-muted)',
           fontSize: '14px',
-          fontWeight: 500,
-          marginBottom: '16px'
+          fontWeight: 600,
+          marginBottom: '20px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-sm)',
+          transition: 'color 0.15s ease'
         }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
       >
-        <ArrowLeft size={16} />
-        Back to Cases
+        <ArrowLeft size={16} aria-hidden="true" />
+        <span>Back to Cases</span>
       </button>
 
       {/* Case Header Banner */}
       <div
+        className="fintech-card"
         style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          padding: '24px',
-          border: '1px solid #e2e8f0',
-          marginBottom: '24px',
+          padding: '24px 28px',
+          marginBottom: '28px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: '20px',
+          flexWrap: 'wrap'
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-            <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#0f172a' }}>
+        <div style={{ minWidth: '300px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               {settlementCase.name}
             </h1>
             <span
-              style={{
-                padding: '4px 10px',
-                borderRadius: '12px',
-                fontSize: '12px',
-                fontWeight: 600,
-                backgroundColor: settlementCase.status === 'active' ? '#dcfce7' : '#f1f5f9',
-                color: settlementCase.status === 'active' ? '#166534' : '#475569'
-              }}
+              className={`status-pill ${
+                settlementCase.status === 'active'
+                  ? 'status-pill-active'
+                  : settlementCase.status === 'disbursed'
+                  ? 'status-pill-disbursed'
+                  : 'status-pill-neutral'
+              }`}
             >
               {settlementCase.status.toUpperCase()}
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: '#64748b' }}>
-            <span>Docket: <strong>{settlementCase.docketNumber}</strong></span>
-            <span>Law Firm: <strong>{settlementCase.lawFirmId}</strong></span>
-            <span>Fallback: <strong>{settlementCase.fallbackPaymentMethod}</strong></span>
+          <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+            <span>Docket: <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>{settlementCase.docketNumber}</strong></span>
+            <span>Law Firm: <strong style={{ color: 'var(--text-secondary)' }}>{settlementCase.lawFirmId}</strong></span>
+            <span>Fallback Method: <strong style={{ color: 'var(--text-secondary)' }}>{settlementCase.fallbackPaymentMethod}</strong></span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '32px', textAlign: 'right' }}>
+        <div style={{ display: 'flex', gap: '32px', textAlign: 'right', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: '12px', color: '#64748b' }}>Settlement Pool</div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a' }}>
-              ${settlementCase.settlementFundTotal?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Settlement Pool
+            </div>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+              ${settlementCase.settlementFundTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '12px', color: '#64748b' }}>Election Deadline</div>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>
+          <div style={{ minWidth: '120px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Election Deadline
+            </div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-secondary)' }}>
               {new Date(settlementCase.disbursementDeadline).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -222,56 +231,91 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
 
       {/* Tabs Bar */}
       <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          borderBottom: '1px solid #e2e8f0',
-          marginBottom: '24px'
-        }}
+        role="tablist"
+        aria-label="Case Detail Navigation Tabs"
+        className="fintech-tab-strip"
+        style={{ marginBottom: '28px' }}
       >
         <button
           type="button"
+          role="tab"
+          id="tab-analytics"
+          aria-selected={activeTab === 'analytics'}
+          aria-controls="panel-analytics"
+          tabIndex={activeTab === 'analytics' ? 0 : -1}
           onClick={() => setActiveTab('analytics')}
-          style={getTabStyle(activeTab === 'analytics')}
+          className={`fintech-tab-item ${activeTab === 'analytics' ? 'active' : ''}`}
         >
-          <BarChart3 size={16} />
-          Analytics & Exceptions
+          <BarChart3 size={16} aria-hidden="true" />
+          <span>Analytics & Exceptions</span>
         </button>
 
         <button
           type="button"
+          role="tab"
+          id="tab-ingestion"
+          aria-selected={activeTab === 'ingestion'}
+          aria-controls="panel-ingestion"
+          tabIndex={activeTab === 'ingestion' ? 0 : -1}
           onClick={() => setActiveTab('ingestion')}
-          style={getTabStyle(activeTab === 'ingestion')}
+          className={`fintech-tab-item ${activeTab === 'ingestion' ? 'active' : ''}`}
         >
-          <DollarSign size={16} />
-          Roster Ingestion
+          <DollarSign size={16} aria-hidden="true" />
+          <span>Roster Ingestion</span>
         </button>
 
         <button
           type="button"
+          role="tab"
+          id="tab-claimants"
+          aria-selected={activeTab === 'claimants'}
+          aria-controls="panel-claimants"
+          tabIndex={activeTab === 'claimants' ? 0 : -1}
           onClick={() => setActiveTab('claimants')}
-          style={getTabStyle(activeTab === 'claimants')}
+          className={`fintech-tab-item ${activeTab === 'claimants' ? 'active' : ''}`}
         >
-          <Users size={16} />
-          Claimant Records ({claimantTotal})
+          <Users size={16} aria-hidden="true" />
+          <span>Claimant Records</span>
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '2px 7px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: activeTab === 'claimants' ? 'var(--color-primary)' : 'var(--bg-card-subtle)',
+              color: activeTab === 'claimants' ? '#ffffff' : 'var(--text-muted)',
+              fontWeight: 700
+            }}
+          >
+            {claimantTotal}
+          </span>
         </button>
 
         <button
           type="button"
+          role="tab"
+          id="tab-templates"
+          aria-selected={activeTab === 'templates'}
+          aria-controls="panel-templates"
+          tabIndex={activeTab === 'templates' ? 0 : -1}
           onClick={() => setActiveTab('templates')}
-          style={getTabStyle(activeTab === 'templates')}
+          className={`fintech-tab-item ${activeTab === 'templates' ? 'active' : ''}`}
         >
-          <Mail size={16} />
-          Quill Template Designer
+          <Mail size={16} aria-hidden="true" />
+          <span>Quill Template Designer</span>
         </button>
 
         <button
           type="button"
+          role="tab"
+          id="tab-settings"
+          aria-selected={activeTab === 'settings'}
+          aria-controls="panel-settings"
+          tabIndex={activeTab === 'settings' ? 0 : -1}
           onClick={() => setActiveTab('settings')}
-          style={getTabStyle(activeTab === 'settings')}
+          className={`fintech-tab-item ${activeTab === 'settings' ? 'active' : ''}`}
         >
-          <Settings size={16} />
-          Deadline & Settings
+          <Settings size={16} aria-hidden="true" />
+          <span>Deadline & Settings</span>
         </button>
       </div>
 
@@ -545,19 +589,3 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
     </div>
   );
 };
-
-function getTabStyle(isActive: boolean): React.CSSProperties {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 18px',
-    border: 'none',
-    borderBottom: isActive ? '2px solid #1e3a8a' : '2px solid transparent',
-    backgroundColor: 'transparent',
-    color: isActive ? '#1e3a8a' : '#64748b',
-    fontWeight: isActive ? 600 : 500,
-    fontSize: '14px',
-    cursor: 'pointer'
-  };
-}

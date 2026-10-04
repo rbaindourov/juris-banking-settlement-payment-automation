@@ -12,131 +12,158 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
 
   return (
     <div
+      className="fintech-card"
+      role="region"
+      aria-label="Claimant Identity and Award Information"
       style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        padding: '24px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-        marginBottom: '24px'
+        padding: '24px 28px',
+        marginBottom: '28px',
+        background: 'linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)'
       }}
     >
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
           gap: '20px',
           alignItems: 'center'
         }}
       >
-        {/* Claimant Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* 1. Verified Claimant Name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              backgroundColor: '#eff6ff',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'var(--bg-active)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#1d4ed8'
+              color: 'var(--color-indigo)',
+              boxShadow: '0 2px 4px rgba(37, 99, 235, 0.15)',
+              flexShrink: 0
             }}
           >
-            <UserCheck size={22} />
+            <UserCheck size={24} aria-hidden="true" />
           </div>
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {t('claimantName')}
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', marginTop: '1px' }}>
               {claim.firstName} {claim.lastName}
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--color-success-text)', fontWeight: 600 }}>
+              &bull; Verified Class Member
             </div>
           </div>
         </div>
 
-        {/* Claim ID */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* 2. Claim ID */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              backgroundColor: '#f8fafc',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'var(--bg-card-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#475569'
+              color: 'var(--text-secondary)',
+              flexShrink: 0
             }}
           >
-            <FileText size={22} />
+            <FileText size={22} aria-hidden="true" />
           </div>
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {t('claimId')}
             </div>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: '#1e293b', fontFamily: 'monospace' }}>
+            <div
+              style={{
+                fontSize: '15px',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-mono)',
+                backgroundColor: 'var(--bg-card-subtle)',
+                padding: '3px 8px',
+                borderRadius: 'var(--radius-sm)',
+                display: 'inline-block',
+                marginTop: '2px',
+                border: '1px solid var(--border-subtle)'
+              }}
+            >
               {claim.claimId}
             </div>
           </div>
         </div>
 
-        {/* Settlement Award Amount */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* 3. Confirmed Settlement Award Amount */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              backgroundColor: '#ecfdf5',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'var(--color-success-bg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#059669'
+              color: 'var(--color-success)',
+              boxShadow: '0 2px 4px rgba(5, 150, 105, 0.15)',
+              flexShrink: 0
             }}
           >
-            <Award size={22} />
+            <Award size={24} aria-hidden="true" />
           </div>
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#059669', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {t('awardAmount')}
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#047857' }}>
+            <div
+              style={{
+                fontSize: '26px',
+                fontWeight: 800,
+                color: 'var(--color-success-text)',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                marginTop: '2px'
+              }}
+            >
               {claim.formattedAwardAmount || `$${claim.settlementAmount.toFixed(2)}`}
             </div>
           </div>
         </div>
 
-        {/* Status Badge */}
+        {/* 4. Election Status */}
         <div>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: '6px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
             {t('status')}
           </div>
           <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              fontSize: '13px',
-              fontWeight: 600,
-              backgroundColor: isSelected ? '#ecfdf5' : claim.isExpired ? '#fef2f2' : '#eff6ff',
-              color: isSelected ? '#065f46' : claim.isExpired ? '#991b1b' : '#1e40af',
-              border: `1px solid ${isSelected ? '#a7f3d0' : claim.isExpired ? '#fecaca' : '#bfdbfe'}`
-            }}
+            className={`status-pill ${
+              isSelected
+                ? 'status-pill-success'
+                : claim.isExpired
+                ? 'status-pill-danger'
+                : 'status-pill-disbursed'
+            }`}
+            style={{ padding: '6px 14px', fontSize: '12px' }}
           >
             {isSelected ? (
               <>
-                <CheckCircle2 size={16} />
-                {t('statusSelected')}
+                <CheckCircle2 size={16} aria-hidden="true" />
+                <span>{t('statusSelected')}</span>
               </>
             ) : claim.isExpired ? (
-              t('statusExpired')
+              <span>{t('statusExpired')}</span>
             ) : (
               <>
-                <Clock size={16} />
-                {t('statusPending')}
+                <Clock size={16} aria-hidden="true" />
+                <span>{t('statusPending')}</span>
               </>
             )}
           </span>

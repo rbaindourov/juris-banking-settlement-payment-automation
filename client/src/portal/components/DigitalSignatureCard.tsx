@@ -28,33 +28,39 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
 }) => {
   return (
     <div
+      className="fintech-card"
+      role="region"
+      aria-label="Digital Signature and Affirmation"
       style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        padding: '24px',
-        marginBottom: '24px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+        padding: '28px',
+        marginBottom: '28px',
+        background: 'linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
         <div
           style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '6px',
-            backgroundColor: '#eff6ff',
-            color: '#1d4ed8',
+            width: '38px',
+            height: '38px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--bg-active)',
+            color: 'var(--color-indigo)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.15)'
           }}
         >
-          <PenTool size={20} />
+          <PenTool size={20} aria-hidden="true" />
         </div>
-        <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-          {t('step2Title')}
-        </h3>
+        <div>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
+            {t('step2Title')}
+          </h3>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+            Under penalty of perjury pursuant to 28 U.S.C. § 1746
+          </span>
+        </div>
       </div>
 
       {/* Perjury Affirmation Checkbox */}
@@ -63,10 +69,10 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
           display: 'flex',
           gap: '12px',
           alignItems: 'flex-start',
-          backgroundColor: '#f8fafc',
-          padding: '16px',
-          borderRadius: '8px',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--bg-card-subtle)',
+          padding: '16px 18px',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-subtle)',
           marginBottom: '20px'
         }}
       >
@@ -80,7 +86,8 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
             width: '18px',
             height: '18px',
             marginTop: '3px',
-            cursor: disabled ? 'not-allowed' : 'pointer'
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            accentColor: 'var(--color-indigo)'
           }}
         />
         <label
@@ -88,8 +95,9 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
           style={{
             fontSize: '13px',
             lineHeight: 1.6,
-            color: '#334155',
-            cursor: disabled ? 'not-allowed' : 'pointer'
+            color: 'var(--text-secondary)',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            fontWeight: 500
           }}
         >
           {t('perjuryCheckbox')}
@@ -100,7 +108,7 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
       <div style={{ marginBottom: '20px' }}>
         <label
           htmlFor="typedSignature"
-          style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1e293b', marginBottom: '6px' }}
+          style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}
         >
           Type Your Full Legal Name (Electronic Signature)
         </label>
@@ -111,15 +119,13 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
           placeholder={t('signaturePlaceholder')}
           value={signature}
           onChange={(e) => onChangeSignature(e.target.value)}
+          className="fintech-input"
           style={{
-            width: '100%',
             padding: '12px 14px',
-            borderRadius: '6px',
-            border: '1px solid #cbd5e1',
-            fontSize: '15px',
-            fontFamily: 'serif',
+            fontSize: '16px',
+            fontFamily: 'Georgia, serif',
             fontStyle: 'italic',
-            outline: 'none',
+            letterSpacing: '0.02em',
             boxSizing: 'border-box'
           }}
         />
@@ -132,11 +138,11 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
           alignItems: 'center',
           gap: '8px',
           fontSize: '12px',
-          color: '#64748b',
+          color: 'var(--text-muted)',
           marginBottom: '24px'
         }}
       >
-        <ShieldCheck size={16} color="#059669" style={{ flexShrink: 0 }} />
+        <ShieldCheck size={16} color="var(--color-success)" style={{ flexShrink: 0 }} aria-hidden="true" />
         <span>{t('auditNotice')}</span>
       </div>
 
@@ -145,11 +151,12 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
         type="button"
         disabled={disabled || !canSubmit || isSubmitting}
         onClick={onSubmit}
+        aria-label="Submit Settlement Election"
         style={{
           width: '100%',
           padding: '14px 20px',
-          borderRadius: '8px',
-          backgroundColor: canSubmit && !disabled ? '#1e3a8a' : '#94a3b8',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: canSubmit && !disabled ? 'var(--color-primary)' : '#94a3b8',
           color: '#ffffff',
           fontSize: '16px',
           fontWeight: 700,
@@ -159,15 +166,15 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           gap: '8px',
-          transition: 'background-color 0.2s ease',
-          boxShadow: canSubmit && !disabled ? '0 4px 6px rgba(30, 58, 138, 0.25)' : 'none'
+          transition: 'all 0.15s ease',
+          boxShadow: canSubmit && !disabled ? '0 4px 10px rgba(30, 58, 138, 0.25)' : 'none'
         }}
       >
         {isSubmitting ? (
           <span>{t('submitting')}</span>
         ) : (
           <>
-            <CheckCircle2 size={20} />
+            <CheckCircle2 size={20} aria-hidden="true" />
             <span>
               {t('submitButton')} {settlementAmountFormatted ? `(${settlementAmountFormatted})` : ''}
             </span>

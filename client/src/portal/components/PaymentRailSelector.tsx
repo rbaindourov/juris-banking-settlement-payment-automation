@@ -192,12 +192,8 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
       <div
         role="tablist"
         aria-label="Payment rails selection"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-          gap: '12px',
-          marginBottom: '24px'
-        }}
+        className="payment-rail-grid"
+        style={{ marginBottom: '24px' }}
       >
         {RAILS_CONFIG.map((rail) => {
           const isCurrent = selectedRail === rail.id;
@@ -208,45 +204,21 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
               type="button"
               role="tab"
               aria-selected={isCurrent}
+              aria-label={`${t(rail.nameKey)} (${rail.speed})`}
               disabled={disabled}
               onClick={() => onSelectRail(rail.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '14px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${isCurrent ? '#2563eb' : '#e2e8f0'}`,
-                backgroundColor: isCurrent ? '#eff6ff' : '#ffffff',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                textAlign: 'left',
-                outline: 'none',
-                transition: 'all 0.15s ease',
-                opacity: disabled ? 0.6 : 1
-              }}
+              className={`payment-rail-card ${isCurrent ? 'selected' : ''}`}
             >
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  backgroundColor: isCurrent ? '#2563eb' : '#f1f5f9',
-                  color: isCurrent ? '#ffffff' : '#475569',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}
-              >
-                <Icon size={20} />
+              <div className="payment-rail-icon-box">
+                <Icon size={20} aria-hidden="true" />
               </div>
               <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: isCurrent ? '#1e40af' : '#1e293b' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: isCurrent ? 'var(--color-indigo)' : 'var(--text-primary)' }}>
                   {t(rail.nameKey)}
                 </div>
-                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{rail.speed}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 500 }}>{rail.speed}</div>
               </div>
-              {isCurrent && <CheckCircle size={18} color="#2563eb" style={{ flexShrink: 0 }} />}
+              {isCurrent && <CheckCircle size={18} color="var(--color-indigo)" style={{ flexShrink: 0 }} aria-hidden="true" />}
             </button>
           );
         })}
@@ -255,35 +227,44 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
       {/* Rail Form Sub-Section */}
       <div
         style={{
-          borderTop: '1px solid #e2e8f0',
+          borderTop: '1px solid var(--border-subtle)',
           paddingTop: '20px'
         }}
       >
         {selectedRail === 'ach' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="achRouting" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('routingNumber')}
               </label>
               <input
+                id="achRouting"
                 type="text"
                 disabled={disabled}
                 placeholder="021000021"
                 maxLength={9}
                 value={details.routingNumber || ''}
                 onChange={(e) => updateField('routingNumber', e.target.value.replace(/\D/g, ''))}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.routingNumber ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.routingNumber ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
+              {/* Real-time ABA Check-digit Feedback */}
+              {details.routingNumber && details.routingNumber.length === 9 && isValidAbaRouting(details.routingNumber) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-success)', marginTop: '4px', fontWeight: 600 }}>
+                  <CheckCircle size={14} color="var(--color-success)" aria-hidden="true" />
+                  <span>
+                    Valid Federal Reserve ABA Routing Number
+                    {details.routingNumber === '021000021' ? ' (JPMorgan Chase NY)' : details.routingNumber === '121000358' ? ' (Bank of America CA)' : ''}
+                  </span>
+                </div>
+              )}
               {errors.routingNumber && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.routingNumber}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px', fontWeight: 500 }}>
+                  <AlertCircle size={14} color="var(--color-danger)" aria-hidden="true" />
+                  <span>{errors.routingNumber}</span>
+                </div>
               )}
             </div>
 

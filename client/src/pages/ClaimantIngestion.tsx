@@ -96,10 +96,10 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
       <div>
-        <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#0f172a' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>
           Batch Claimant Ingestion
         </h2>
-        <p style={{ fontSize: '14px', color: '#64748b' }}>
+        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
           Upload CSV or Excel (.xlsx) roster files. Two-phase staging validates schemas, duplicates, and fund variance before database commit.
         </p>
       </div>
@@ -107,38 +107,40 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
       {/* Success Notification */}
       {commitMessage && (
         <div
+          role="status"
           style={{
             padding: '16px',
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            borderRadius: '8px',
+            backgroundColor: 'var(--color-success-bg)',
+            border: '1px solid var(--color-success-border)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            color: '#166534'
+            color: 'var(--color-success-text)'
           }}
         >
-          <CheckCircle2 size={20} color="#16a34a" />
-          <span style={{ fontSize: '14px', fontWeight: 500 }}>{commitMessage}</span>
+          <CheckCircle2 size={20} color="var(--color-success)" aria-hidden="true" />
+          <span style={{ fontSize: '14px', fontWeight: 600 }}>{commitMessage}</span>
         </div>
       )}
 
       {/* Error Notification */}
       {errorMsg && (
         <div
+          role="alert"
           style={{
             padding: '16px',
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '8px',
+            backgroundColor: 'var(--color-danger-bg)',
+            border: '1px solid var(--color-danger-border)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            color: '#991b1b'
+            color: 'var(--color-danger-text)'
           }}
         >
-          <AlertCircle size={20} color="#dc2626" />
-          <span style={{ fontSize: '14px', fontWeight: 500 }}>{errorMsg}</span>
+          <AlertCircle size={20} color="var(--color-danger)" aria-hidden="true" />
+          <span style={{ fontSize: '14px', fontWeight: 600 }}>{errorMsg}</span>
         </div>
       )}
 
@@ -147,18 +149,24 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
+        aria-label="Upload claimant roster file"
+        className="fintech-card"
         style={{
-          border: '2px dashed #cbd5e1',
-          borderRadius: '12px',
-          padding: '40px 20px',
+          border: '2px dashed var(--border-default)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '44px 24px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '12px',
+          gap: '14px',
           backgroundColor: '#ffffff',
           cursor: 'pointer',
-          transition: 'border-color 0.2s ease'
+          transition: 'all 0.2s ease',
+          boxShadow: 'var(--shadow-xs)'
         }}
       >
         <input
@@ -167,27 +175,30 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
           accept=".csv,.xlsx,.xls"
           onChange={handleFileChange}
           style={{ display: 'none' }}
+          aria-hidden="true"
         />
 
         <div
           style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: '#eff6ff',
+            width: '60px',
+            height: '60px',
+            borderRadius: 'var(--radius-full)',
+            backgroundColor: 'var(--bg-active)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            color: 'var(--color-indigo)',
+            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
           }}
         >
-          <UploadCloud size={28} color="#2563eb" />
+          <UploadCloud size={30} aria-hidden="true" />
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b' }}>
+          <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
             {selectedFile ? selectedFile.name : 'Click or drag claimant roster file to stage'}
           </p>
-          <p style={{ fontSize: '13px', color: '#64748b' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
             Supported formats: CSV, Excel (.xlsx, .xls) up to 50MB
           </p>
         </div>

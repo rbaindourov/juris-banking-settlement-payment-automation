@@ -24,11 +24,11 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
   if (isLoading || !methodsData) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm h-80 animate-pulse">
+        <div className="fintech-card p-6 h-80 animate-pulse">
           <div className="h-5 bg-slate-200 rounded w-1/3 mb-4"></div>
           <div className="h-60 bg-slate-100 rounded"></div>
         </div>
-        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm h-80 animate-pulse">
+        <div className="fintech-card p-6 h-80 animate-pulse">
           <div className="h-5 bg-slate-200 rounded w-1/3 mb-4"></div>
           <div className="h-60 bg-slate-100 rounded"></div>
         </div>
@@ -42,8 +42,8 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
   // If no claimants have selected payment rails yet
   if (totalSelected === 0) {
     return (
-      <div className="bg-white rounded-lg p-8 border border-slate-200 shadow-sm mb-6 text-center">
-        <h3 className="text-lg font-semibold text-slate-800 mb-1">
+      <div className="fintech-card p-8 mb-6 text-center">
+        <h3 className="text-lg font-bold text-slate-800 mb-1">
           Payment Method Distribution (All 9 Rails)
         </h3>
         <p className="text-sm text-slate-500 mb-4">
@@ -52,7 +52,7 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
         <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mt-4 text-xs text-slate-600">
           {methods.map((m) => (
             <div key={m.method} className="p-2 bg-slate-50 rounded border border-slate-200 flex flex-col items-center">
-              <span className="w-3 h-3 rounded-full mb-1" style={{ backgroundColor: m.color }}></span>
+              <span className="w-3 h-3 rounded-full mb-1" style={{ backgroundColor: m.color }} />
               <span className="truncate w-full text-center" title={m.name}>{m.name.split(' ')[0]}</span>
               <span className="font-bold text-slate-900 mt-1">0</span>
             </div>
@@ -67,10 +67,10 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
-        <div className="bg-slate-900 text-white p-2.5 rounded shadow-lg text-xs">
-          <p className="font-bold text-sm">{item.name}</p>
-          <p className="text-slate-300 mt-1">Amount: {item.totalAmountFormatted || `$${item.totalAmount.toLocaleString()}`}</p>
-          <p className="text-slate-300">Volume: {item.count.toLocaleString()} claimants ({item.percentage}%)</p>
+        <div style={{ backgroundColor: '#0f172a', color: '#ffffff', padding: '10px 14px', borderRadius: '8px', boxShadow: 'var(--shadow-lg)', fontSize: '12px' }}>
+          <p style={{ fontWeight: 700, fontSize: '13px' }}>{item.name}</p>
+          <p style={{ color: '#cbd5e1', marginTop: '4px' }}>Amount: <strong style={{ color: '#ffffff' }}>{item.totalAmountFormatted || `$${item.totalAmount.toLocaleString()}`}</strong></p>
+          <p style={{ color: '#cbd5e1' }}>Volume: {item.count.toLocaleString()} claimants ({item.percentage}%)</p>
         </div>
       );
     }
@@ -81,10 +81,10 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
-        <div className="bg-slate-900 text-white p-2.5 rounded shadow-lg text-xs">
-          <p className="font-bold text-sm">{item.name}</p>
-          <p className="text-slate-300 mt-1">Claimants: {item.count.toLocaleString()}</p>
-          <p className="text-slate-300">Share: {item.percentage}%</p>
+        <div style={{ backgroundColor: '#0f172a', color: '#ffffff', padding: '10px 14px', borderRadius: '8px', boxShadow: 'var(--shadow-lg)', fontSize: '12px' }}>
+          <p style={{ fontWeight: 700, fontSize: '13px' }}>{item.name}</p>
+          <p style={{ color: '#cbd5e1', marginTop: '4px' }}>Claimants: <strong style={{ color: '#ffffff' }}>{item.count.toLocaleString()}</strong></p>
+          <p style={{ color: '#cbd5e1' }}>Share: <strong style={{ color: '#38bdf8' }}>{item.percentage}%</strong></p>
         </div>
       );
     }
@@ -92,19 +92,19 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6" role="region" aria-label="Payment Rails Distribution Charts">
       {/* 1. Volume Share Donut Chart */}
-      <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div className="fintech-card p-6 flex flex-col justify-between">
         <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">
+            <h3 className="text-base font-bold text-slate-900">
               Payment Rail Share (%)
             </h3>
             <p className="text-xs text-slate-500">
               Claimant volume distribution across 9 rails
             </p>
           </div>
-          <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded">
+          <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
             {totalSelected.toLocaleString()} Selected
           </span>
         </div>
@@ -134,7 +134,7 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
         {/* Legend pills */}
         <div className="flex flex-wrap gap-2 mt-4 text-xs">
           {activeMethods.map((m) => (
-            <div key={m.method} className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded">
+            <div key={m.method} className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-md">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.color }} />
               <span className="font-medium text-slate-700">{m.name}:</span>
               <span className="font-bold text-slate-900">{m.percentage}%</span>
@@ -144,17 +144,17 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
       </div>
 
       {/* 2. Dollar Allocation Bar Chart */}
-      <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div className="fintech-card p-6 flex flex-col justify-between">
         <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">
+            <h3 className="text-base font-bold text-slate-900">
               Disbursement Dollar Allocation ($)
             </h3>
             <p className="text-xs text-slate-500">
               Total funds routed per payment rail
             </p>
           </div>
-          <span className="text-xs font-semibold text-slate-700 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-1 rounded">
+          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
             ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
@@ -169,16 +169,16 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
               <XAxis
                 type="number"
                 tickFormatter={(v) => `$${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`}
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: '#64748b' }}
               />
               <YAxis
                 type="category"
                 dataKey="name"
-                width={100}
-                tick={{ fontSize: 11 }}
+                width={110}
+                tick={{ fontSize: 11, fill: '#334155' }}
               />
               <Tooltip content={renderDollarTooltip} />
-              <Bar dataKey="totalAmount" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="totalAmount" radius={[0, 6, 6, 0]}>
                 {activeMethods.map((entry) => (
                   <Cell key={`bar-${entry.method}`} fill={entry.color} />
                 ))}
@@ -190,31 +190,6 @@ export const PaymentRailDistribution: React.FC<PaymentRailDistributionProps> = (
         <div className="text-xs text-slate-500 mt-4 text-center">
           Includes all 9 payment rails (Direct Deposit, Cards, Check, Crypto, Wallets, Court Fallback)
         </div>
-      </div>
-
-      {/* Screen-reader accessible table for WCAG 2.1 AA */}
-      <div className="sr-only">
-        <table>
-          <caption>Payment Rail Metrics Breakdown</caption>
-          <thead>
-            <tr>
-              <th scope="col">Payment Rail</th>
-              <th scope="col">Count</th>
-              <th scope="col">Percentage</th>
-              <th scope="col">Total Dollars</th>
-            </tr>
-          </thead>
-          <tbody>
-            {methods.map((m) => (
-              <tr key={m.method}>
-                <td>{m.name}</td>
-                <td>{m.count}</td>
-                <td>{m.percentage}%</td>
-                <td>${m.totalAmount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

@@ -738,6 +738,7 @@ async function main() {
     console.log('\n🎉 [Success] All 4 training videos captured, transcoded, and indexed successfully!');
   } finally {
     cleanup();
+    process.exit(0);
   }
 }
 

@@ -11,7 +11,8 @@ import {
   Eye,
   Tag,
   Undo,
-  Redo
+  Redo,
+  Globe
 } from 'lucide-react';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 import { caseApi } from '../services/api';
@@ -45,10 +46,11 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
   initialHtml = '',
   onChange,
   label = 'Email Template HTML',
-  supportedLanguages = ['en'],
+  supportedLanguages = ['en', 'es', 'zh', 'vi'],
   currentLanguage = 'en'
 }) => {
   const [content, setContent] = useState<string>(initialHtml);
+  const [selectedLang, setSelectedLang] = useState<string>(currentLanguage);
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [previewHtml, setPreviewHtml] = useState<string>('');
   const [isLoadingPreview, setIsLoadingPreview] = useState<boolean>(false);
@@ -68,7 +70,6 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
   };
 
   const insertMergeTag = (tag: string) => {
-    // Focus editor and insert HTML span containing merge tag
     if (editorRef.current) {
       editorRef.current.focus();
       document.execCommand('insertText', false, tag);
@@ -81,7 +82,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
     try {
       const res = await caseApi.previewTemplate(caseId, {
         template: content,
-        language: currentLanguage
+        language: selectedLang
       });
       setPreviewHtml(res.renderedHtml);
       setPreviewOpen(true);
@@ -99,23 +100,50 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {label && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Header with Title and Language Tabs */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <label style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
             {label}
           </label>
-          <span style={{ fontSize: '12px', color: '#64748b' }}>
-            Supports dynamic merge tags & safe styling
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
+            Supports dynamic settlement merge tags, rich formatting, and multi-lingual localization
           </span>
         </div>
-      )}
+
+        {/* Locale tabs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--bg-card-subtle)', padding: '3px', borderRadius: 'var(--radius-md)' }}>
+          <Globe size={14} color="var(--text-muted)" style={{ margin: '0 4px' }} aria-hidden="true" />
+          {supportedLanguages.map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => setSelectedLang(lang)}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '12px',
+                fontWeight: 600,
+                border: 'none',
+                backgroundColor: selectedLang === lang ? '#ffffff' : 'transparent',
+                color: selectedLang === lang ? 'var(--color-primary)' : 'var(--text-muted)',
+                boxShadow: selectedLang === lang ? 'var(--shadow-xs)' : 'none',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Editor Container */}
       <div
+        className="fintech-card"
         style={{
-          border: '1px solid #cbd5e1',
-          borderRadius: '8px',
+          border: '1px solid var(--border-default)',
+          borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
           backgroundColor: '#ffffff'
         }}
@@ -127,15 +155,16 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
             flexWrap: 'wrap',
             alignItems: 'center',
             gap: '6px',
-            padding: '8px 12px',
-            backgroundColor: '#f8fafc',
-            borderBottom: '1px solid #e2e8f0'
+            padding: '10px 14px',
+            backgroundColor: 'var(--bg-card-subtle)',
+            borderBottom: '1px solid var(--border-subtle)'
           }}
         >
           {/* Text formatting */}
           <button
             type="button"
             title="Bold"
+            aria-label="Bold text"
             onClick={() => executeCommand('bold')}
             style={toolbarButtonStyle}
           >
@@ -144,6 +173,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Italic"
+            aria-label="Italic text"
             onClick={() => executeCommand('italic')}
             style={toolbarButtonStyle}
           >
@@ -152,6 +182,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Underline"
+            aria-label="Underline text"
             onClick={() => executeCommand('underline')}
             style={toolbarButtonStyle}
           >
@@ -164,6 +195,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Heading 1"
+            aria-label="Heading 1"
             onClick={() => executeCommand('formatBlock', '<h1>')}
             style={toolbarButtonStyle}
           >
@@ -172,6 +204,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Heading 2"
+            aria-label="Heading 2"
             onClick={() => executeCommand('formatBlock', '<h2>')}
             style={toolbarButtonStyle}
           >
@@ -184,6 +217,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Bullet List"
+            aria-label="Bullet list"
             onClick={() => executeCommand('insertUnorderedList')}
             style={toolbarButtonStyle}
           >
@@ -192,6 +226,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Numbered List"
+            aria-label="Numbered list"
             onClick={() => executeCommand('insertOrderedList')}
             style={toolbarButtonStyle}
           >
@@ -204,6 +239,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Insert Link"
+            aria-label="Insert link"
             onClick={() => {
               const url = prompt('Enter URL (or merge tag):', '{{payment_selection_link}}');
               if (url) executeCommand('createLink', url);
@@ -217,6 +253,7 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Undo"
+            aria-label="Undo edit"
             onClick={() => executeCommand('undo')}
             style={toolbarButtonStyle}
           >
@@ -225,68 +262,73 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           <button
             type="button"
             title="Redo"
+            aria-label="Redo edit"
             onClick={() => executeCommand('redo')}
             style={toolbarButtonStyle}
           >
             <Redo size={16} />
           </button>
 
-          <span style={dividerStyle} />
-
-          {/* Dynamic Merge Tag Dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Tag size={16} color="#0284c7" />
-            <select
-              defaultValue=""
-              onChange={(e) => {
-                if (e.target.value) {
-                  insertMergeTag(e.target.value);
-                  e.target.value = '';
-                }
-              }}
-              style={{
-                padding: '5px 10px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                fontSize: '13px',
-                backgroundColor: '#f0f9ff',
-                color: '#0369a1',
-                fontWeight: 500
-              }}
-            >
-              <option value="" disabled>
-                Insert Merge Tag...
-              </option>
-              {MERGE_TAGS.map(({ tag, label: tagLabel }) => (
-                <option key={tag} value={tag}>
-                  {tagLabel} ({tag})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+          {/* Live Preview Button */}
+          <div style={{ marginLeft: 'auto' }}>
             <button
               type="button"
               onClick={handleOpenPreview}
               disabled={isLoadingPreview}
+              aria-label="Preview Live Template"
+              className="btn-primary"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
                 padding: '6px 14px',
-                backgroundColor: '#1e3a8a',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '6px',
                 fontSize: '13px',
-                fontWeight: 500
+                borderRadius: 'var(--radius-sm)'
               }}
             >
-              <Eye size={15} />
-              {isLoadingPreview ? 'Rendering...' : 'Live Preview'}
+              <Eye size={15} aria-hidden="true" />
+              <span>{isLoadingPreview ? 'Rendering...' : 'Preview Live'}</span>
             </button>
           </div>
+        </div>
+
+        {/* Dynamic Merge Tag Pill Strip */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 14px',
+            backgroundColor: '#ffffff',
+            borderBottom: '1px solid var(--border-subtle)'
+          }}
+        >
+          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Tag size={13} color="var(--color-indigo)" aria-hidden="true" />
+            Merge Tags:
+          </span>
+          {MERGE_TAGS.map(({ tag, label: tagLabel }) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => insertMergeTag(tag)}
+              title={`Click to insert ${tagLabel}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '3px 9px',
+                borderRadius: 'var(--radius-full)',
+                backgroundColor: 'var(--bg-active)',
+                border: '1px solid #bfdbfe',
+                color: 'var(--color-indigo)',
+                fontSize: '11px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{tag}</span>
+            </button>
+          ))}
         </div>
 
         {/* Content Editable Area */}
@@ -295,15 +337,16 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
           contentEditable
           onInput={handleInput}
           dangerouslySetInnerHTML={{ __html: initialHtml }}
+          aria-label="Template email body editor"
           style={{
             minHeight: '260px',
             maxHeight: '480px',
             overflowY: 'auto',
-            padding: '16px',
+            padding: '20px',
             outline: 'none',
             fontSize: '14px',
             lineHeight: 1.6,
-            color: '#1e293b'
+            color: 'var(--text-primary)'
           }}
         />
       </div>
@@ -315,28 +358,30 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
         renderedHtml={previewHtml}
         caseName={caseName}
         supportedLanguages={supportedLanguages}
-        currentLanguage={currentLanguage}
+        currentLanguage={selectedLang}
+        onLanguageChange={(l) => setSelectedLang(l)}
       />
     </div>
   );
 };
 
 const toolbarButtonStyle: React.CSSProperties = {
+  width: '30px',
+  height: '30px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '32px',
-  height: '32px',
-  borderRadius: '6px',
-  border: '1px solid transparent',
-  backgroundColor: 'transparent',
-  color: '#475569',
-  padding: '4px'
+  borderRadius: 'var(--radius-sm)',
+  backgroundColor: '#ffffff',
+  border: '1px solid var(--border-default)',
+  color: 'var(--text-secondary)',
+  cursor: 'pointer',
+  transition: 'all 0.15s ease'
 };
 
 const dividerStyle: React.CSSProperties = {
   width: '1px',
   height: '20px',
-  backgroundColor: '#cbd5e1',
+  backgroundColor: 'var(--border-default)',
   margin: '0 4px'
 };
