@@ -113,12 +113,19 @@ export const QuillTemplateEditor: React.FC<QuillTemplateEditorProps> = ({
         </div>
 
         {/* Locale tabs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--bg-card-subtle)', padding: '3px', borderRadius: 'var(--radius-md)' }}>
+        <div
+          role="tablist"
+          aria-label="Template language selection"
+          style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--bg-card-subtle)', padding: '3px', borderRadius: 'var(--radius-md)' }}
+        >
           <Globe size={14} color="var(--text-muted)" style={{ margin: '0 4px' }} aria-hidden="true" />
           {supportedLanguages.map((lang) => (
             <button
               key={lang}
               type="button"
+              role="tab"
+              aria-selected={selectedLang === lang}
+              aria-label={`Language ${lang.toUpperCase()}`}
               onClick={() => setSelectedLang(lang)}
               style={{
                 padding: '4px 10px',

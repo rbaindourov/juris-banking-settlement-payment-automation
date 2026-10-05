@@ -91,6 +91,7 @@ describe('Portal Payment Rails Validation & Cryptography Unit Tests', () => {
         '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', // Legacy P2PKH (starts with 1)
         '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', // SegWit P2SH (starts with 3)
         'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Native SegWit Bech32 (starts with bc1q)
+        'BC1QAR0SRRR7XFKVY5L643LYDNW9RE59GTZZWF5MDQ', // Native SegWit Bech32 uppercase (BIP173 compliant)
         'bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0' // Taproot Bech32m (starts with bc1p)
       ];
       for (const addr of validBtc) {
@@ -104,6 +105,9 @@ describe('Portal Payment Rails Validation & Cryptography Unit Tests', () => {
         '0A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', // Starts with 0
         'bc1invalid', // Too short
         '2MvFTpC45hV7zXWJp...', // Testnet prefix
+        'bc1qAR0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Mixed-case Bech32 (rejected per BIP173)
+        'BC1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', // Mixed-case Bech32 (rejected per BIP173)
+        'bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5JJ0', // Mixed-case Bech32m (rejected per BIP350)
         ''
       ];
       for (const addr of invalidBtc) {

@@ -229,21 +229,17 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
             type="button"
             onClick={handleStageUpload}
             disabled={isUploading}
+            className="btn-primary"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               padding: '10px 20px',
-              backgroundColor: '#1e3a8a',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 600
+              fontSize: '14px'
             }}
           >
             {isUploading ? 'Parsing & Staging...' : 'Phase 1: Stage & Validate Roster'}
-            <ArrowRight size={16} />
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
       )}
@@ -255,7 +251,7 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
               gap: '16px'
             }}
           >
@@ -385,10 +381,10 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
               >
                 Validation Issues ({stageResult.errors.length})
               </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              <div className="overflow-x-auto" style={{ maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
-                    <tr style={{ backgroundColor: '#f8fafc', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
+                    <tr style={{ backgroundColor: 'var(--bg-body)', textAlign: 'left', borderBottom: '1px solid var(--border-subtle)' }}>
                       <th style={{ padding: '8px 16px' }}>Row</th>
                       <th style={{ padding: '8px 16px' }}>Claim ID</th>
                       <th style={{ padding: '8px 16px' }}>Error Code</th>
@@ -397,11 +393,11 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
                   </thead>
                   <tbody>
                     {stageResult.errors.map((err, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <tr key={idx} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                         <td style={{ padding: '8px 16px', fontWeight: 500 }}>{err.row > 0 ? err.row : 'Header'}</td>
-                        <td style={{ padding: '8px 16px' }}>{err.claimId || '—'}</td>
-                        <td style={{ padding: '8px 16px', color: '#dc2626', fontWeight: 500 }}>{err.code}</td>
-                        <td style={{ padding: '8px 16px', color: '#64748b' }}>{err.message}</td>
+                        <td style={{ padding: '8px 16px', fontFamily: 'var(--font-mono)' }}>{err.claimId || '—'}</td>
+                        <td style={{ padding: '8px 16px', color: 'var(--color-danger)', fontWeight: 600 }}>{err.code}</td>
+                        <td style={{ padding: '8px 16px', color: 'var(--text-muted)' }}>{err.message}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -413,26 +409,25 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
           {/* Staged Preview Table */}
           {stageResult.preview && stageResult.preview.length > 0 && (
             <div
+              className="fintech-card"
               style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
+                padding: 0,
                 overflow: 'hidden'
               }}
             >
               <div
                 style={{
                   padding: '12px 16px',
-                  backgroundColor: '#f8fafc',
-                  borderBottom: '1px solid #e2e8f0',
-                  fontWeight: 600,
+                  backgroundColor: 'var(--bg-body)',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  fontWeight: 700,
                   fontSize: '14px',
-                  color: '#0f172a'
+                  color: 'var(--text-primary)'
                 }}
               >
                 Staged Roster Preview (First {stageResult.preview.length} Valid Records)
               </div>
-              <div style={{ maxHeight: '260px', overflowY: 'auto' }}>
+              <div className="overflow-x-auto" style={{ maxHeight: '260px', overflowY: 'auto', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#f8fafc', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
@@ -481,22 +476,14 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
           )}
 
           {/* Commit Action Button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={() => {
                 setStageResult(null);
                 setSelectedFile(null);
               }}
-              style={{
-                padding: '10px 18px',
-                backgroundColor: '#f1f5f9',
-                color: '#475569',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -505,21 +492,18 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
               type="button"
               onClick={handleCommit}
               disabled={!stageResult.canCommit || isCommitting}
+              className="btn-primary"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 padding: '10px 24px',
-                backgroundColor: stageResult.canCommit ? '#16a34a' : '#cbd5e1',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: stageResult.canCommit ? 'pointer' : 'not-allowed'
+                minHeight: '44px',
+                backgroundColor: stageResult.canCommit ? 'var(--color-success)' : 'var(--border-strong)',
+                cursor: stageResult.canCommit && !isCommitting ? 'pointer' : 'not-allowed'
               }}
             >
-              <Database size={16} />
+              <Database size={16} aria-hidden="true" />
               {isCommitting ? 'Committing to Database...' : `Phase 2: Commit ${stageResult.validCount} Claimants`}
             </button>
           </div>
@@ -530,9 +514,9 @@ export const ClaimantIngestion: React.FC<ClaimantIngestionProps> = ({
 };
 
 const metricCardStyle: React.CSSProperties = {
-  backgroundColor: '#ffffff',
+  backgroundColor: 'var(--bg-card)',
   padding: '16px',
-  borderRadius: '8px',
-  border: '1px solid #e2e8f0',
-  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--border-subtle)',
+  boxShadow: 'var(--shadow-xs)'
 };

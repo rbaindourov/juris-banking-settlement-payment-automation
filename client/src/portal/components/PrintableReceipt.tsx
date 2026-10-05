@@ -63,11 +63,11 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
 
   return (
     <div
-      className="fintech-card"
+      className="fintech-card break-words"
       role="region"
       aria-label="Official Settlement Payment Receipt"
       style={{
-        padding: '36px',
+        padding: 'clamp(20px, 4vw, 36px)',
         maxWidth: '780px',
         margin: '0 auto',
         boxShadow: 'var(--shadow-md)'
@@ -119,7 +119,7 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
           padding: '24px 0',
           marginBottom: '24px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
           gap: '20px'
         }}
       >
@@ -146,7 +146,7 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
         </div>
 
         <div>
-          <div style={{ fontSize: '11px', color: 'var(--color-success)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Confirmed Settlement Award</div>
+          <div style={{ fontSize: '11px', color: 'var(--color-success-text)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Confirmed Settlement Award</div>
           <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-success-text)', fontVariantNumeric: 'tabular-nums', marginTop: '2px' }}>
             {receipt.formattedAmount || `$${receipt.amount.toFixed(2)}`}
           </div>
@@ -196,7 +196,7 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="no-print" style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           type="button"
           onClick={handlePrint}

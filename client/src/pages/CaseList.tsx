@@ -76,7 +76,7 @@ export const CaseList: React.FC<CaseListProps> = ({ onSelectCase }) => {
   };
 
   return (
-    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '32px 24px' }}>
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: 'clamp(20px, 4vw, 32px) clamp(16px, 3vw, 24px)' }}>
       {/* Page Header */}
       <div
         style={{
@@ -119,7 +119,7 @@ export const CaseList: React.FC<CaseListProps> = ({ onSelectCase }) => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
           gap: '16px',
           marginBottom: '28px'
         }}
@@ -353,7 +353,7 @@ export const CaseList: React.FC<CaseListProps> = ({ onSelectCase }) => {
                 className="fintech-card fintech-card-interactive"
                 aria-label={`Open matter ${c.name}`}
                 style={{
-                  padding: '20px 24px',
+                  padding: 'clamp(16px, 3vw, 20px) clamp(16px, 3vw, 24px)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -362,22 +362,22 @@ export const CaseList: React.FC<CaseListProps> = ({ onSelectCase }) => {
                 }}
               >
                 {/* Left: Case Info */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '280px', flex: '1 1 auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0, flex: '1 1 260px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em', wordBreak: 'break-word' }}>
                       {c.name}
                     </h3>
                     {getStatusPill(c.status)}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                    <span>Docket: <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>{c.docketNumber}</strong></span>
+                    <span>Docket: <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>{c.docketNumber}</strong></span>
                     <span>Firm: <strong style={{ color: 'var(--text-secondary)' }}>{c.lawFirmId}</strong></span>
                     <span>Fallback: <strong style={{ color: 'var(--text-secondary)' }}>{c.fallbackPaymentMethod}</strong></span>
                   </div>
                 </div>
 
                 {/* Right: Metrics & Action */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(16px, 3vw, 32px)', flexWrap: 'wrap' }}>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       Settlement Pool

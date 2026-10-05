@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Monitor, Smartphone, X, Globe } from 'lucide-react';
 
 interface TemplatePreviewModalProps {
@@ -24,34 +24,74 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 }) => {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>(defaultViewport);
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modalEl = modalRef.current;
+    if (!modalEl) return;
+
+    const focusables = modalEl.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length > 0) {
+      focusables[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const currentFocusables = Array.from(modalEl.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((el) => el.offsetParent !== null);
+
+        if (currentFocusables.length === 0) return;
+        const first = currentFocusables[0];
+        const last = currentFocusables[currentFocusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div
+      ref={modalRef}
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="preview-modal-title"
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.75)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '20px'
+        zIndex: 9999
       }}
     >
       <div
+        className="modal-container"
         style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          width: '100%',
-          maxWidth: '900px',
+          maxWidth: '920px',
           height: '85vh',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           overflow: 'hidden'
         }}
       >
@@ -59,36 +99,37 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
         <div
           style={{
             padding: '16px 24px',
-            borderBottom: '1px solid #e2e8f0',
+            borderBottom: '1px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: '#f8fafc'
+            backgroundColor: 'var(--bg-body)',
+            flexWrap: 'wrap',
+            gap: '12px'
           }}
         >
           <div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
+            <h3 id="preview-modal-title" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
               Live Template Preview
             </h3>
-            <p style={{ fontSize: '13px', color: '#64748b' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
               {caseName} — Real-time dynamic merge tag evaluation
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             {/* Language Switcher */}
             {supportedLanguages.length > 1 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Globe size={16} color="#64748b" />
+                <Globe size={16} color="var(--text-muted)" aria-hidden="true" />
                 <select
+                  aria-label="Select preview language"
                   value={currentLanguage}
                   onChange={(e) => onLanguageChange?.(e.target.value)}
+                  className="fintech-select"
                   style={{
                     padding: '6px 10px',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '13px',
-                    backgroundColor: '#ffffff'
+                    fontSize: '13px'
                   }}
                 >
                   {supportedLanguages.map((lang) => (
@@ -104,49 +145,53 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#e2e8f0',
-                borderRadius: '8px',
+                backgroundColor: 'var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
                 padding: '3px'
               }}
             >
               <button
                 type="button"
                 onClick={() => setViewport('desktop')}
+                aria-pressed={viewport === 'desktop'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  minHeight: '38px',
+                  borderRadius: 'var(--radius-sm)',
                   border: 'none',
                   fontSize: '13px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   backgroundColor: viewport === 'desktop' ? '#ffffff' : 'transparent',
-                  color: viewport === 'desktop' ? '#0f172a' : '#64748b',
-                  boxShadow: viewport === 'desktop' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  color: viewport === 'desktop' ? 'var(--text-primary)' : 'var(--text-muted)',
+                  boxShadow: viewport === 'desktop' ? 'var(--shadow-xs)' : 'none'
                 }}
               >
-                <Monitor size={16} />
+                <Monitor size={16} aria-hidden="true" />
                 Desktop
               </button>
               <button
                 type="button"
                 onClick={() => setViewport('mobile')}
+                aria-pressed={viewport === 'mobile'}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  minHeight: '38px',
+                  borderRadius: 'var(--radius-sm)',
                   border: 'none',
                   fontSize: '13px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   backgroundColor: viewport === 'mobile' ? '#ffffff' : 'transparent',
-                  color: viewport === 'mobile' ? '#0f172a' : '#64748b',
-                  boxShadow: viewport === 'mobile' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  color: viewport === 'mobile' ? 'var(--text-primary)' : 'var(--text-muted)',
+                  boxShadow: viewport === 'mobile' ? 'var(--shadow-xs)' : 'none'
                 }}
               >
-                <Smartphone size={16} />
+                <Smartphone size={16} aria-hidden="true" />
                 Mobile
               </button>
             </div>
@@ -154,15 +199,23 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close dialog"
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#64748b',
-                padding: '4px',
-                borderRadius: '6px'
+                color: 'var(--text-muted)',
+                width: '44px',
+                height: '44px',
+                minWidth: '44px',
+                minHeight: '44px',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
               }}
             >
-              <X size={20} />
+              <X size={20} aria-hidden="true" />
             </button>
           </div>
         </div>

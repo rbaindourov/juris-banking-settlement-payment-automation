@@ -72,6 +72,7 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
         const type = details.accountType || 'checking';
 
         if (!routing) errs.routingNumber = 'Routing number is required';
+        else if (routing.length < 9) errs.routingNumber = 'ABA Routing number must be 9 digits';
         else if (!isValidAbaRouting(routing)) errs.routingNumber = 'Invalid 9-digit ABA routing number';
 
         if (!account) errs.accountNumber = 'Account number is required';
@@ -173,18 +174,40 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
     onChangeDetails({ ...details, [field]: val }, false);
   };
 
+  const handleRailKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let nextIndex = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      nextIndex = (index + 1) % RAILS_CONFIG.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      nextIndex = (index - 1 + RAILS_CONFIG.length) % RAILS_CONFIG.length;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      nextIndex = RAILS_CONFIG.length - 1;
+    }
+
+    if (nextIndex >= 0) {
+      const nextRail = RAILS_CONFIG[nextIndex];
+      onSelectRail(nextRail.id);
+      setTimeout(() => {
+        document.getElementById(`rail-tab-${nextRail.id}`)?.focus();
+      }, 0);
+    }
+  };
+
   return (
     <div
+      className="fintech-card break-words"
       style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
-        padding: '24px',
-        marginBottom: '24px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+        padding: 'clamp(16px, 3.5vw, 24px)',
+        marginBottom: '24px'
       }}
     >
-      <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 16px 0' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 16px 0', letterSpacing: '-0.01em' }}>
         {t('step1Title')}
       </h3>
 
@@ -195,7 +218,7 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
         className="payment-rail-grid"
         style={{ marginBottom: '24px' }}
       >
-        {RAILS_CONFIG.map((rail) => {
+        {RAILS_CONFIG.map((rail, index) => {
           const isCurrent = selectedRail === rail.id;
           const Icon = rail.icon;
           return (
@@ -203,10 +226,14 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
               key={rail.id}
               type="button"
               role="tab"
+              id={`rail-tab-${rail.id}`}
+              aria-controls="rail-details-panel"
               aria-selected={isCurrent}
+              tabIndex={isCurrent ? 0 : -1}
               aria-label={`${t(rail.nameKey)} (${rail.speed})`}
               disabled={disabled}
               onClick={() => onSelectRail(rail.id)}
+              onKeyDown={(e) => handleRailKeyDown(e, index)}
               className={`payment-rail-card ${isCurrent ? 'selected' : ''}`}
             >
               <div className="payment-rail-icon-box">
@@ -226,13 +253,16 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
 
       {/* Rail Form Sub-Section */}
       <div
+        id="rail-details-panel"
+        role="tabpanel"
+        aria-labelledby={`rail-tab-${selectedRail}`}
         style={{
           borderTop: '1px solid var(--border-subtle)',
           paddingTop: '20px'
         }}
       >
         {selectedRail === 'ach' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
             <div>
               <label htmlFor="achRouting" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('routingNumber')}
@@ -252,8 +282,8 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
               />
               {/* Real-time ABA Check-digit Feedback */}
               {details.routingNumber && details.routingNumber.length === 9 && isValidAbaRouting(details.routingNumber) && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-success)', marginTop: '4px', fontWeight: 600 }}>
-                  <CheckCircle size={14} color="var(--color-success)" aria-hidden="true" />
+                <div role="status" aria-live="polite" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-success-text)', marginTop: '4px', fontWeight: 600 }}>
+                  <CheckCircle size={14} color="var(--color-success-text)" aria-hidden="true" />
                   <span>
                     Valid Federal Reserve ABA Routing Number
                     {details.routingNumber === '021000021' ? ' (JPMorgan Chase NY)' : details.routingNumber === '121000358' ? ' (Bank of America CA)' : ''}
@@ -261,7 +291,7 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
                 </div>
               )}
               {errors.routingNumber && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px', fontWeight: 500 }}>
+                <div role="alert" aria-live="polite" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px', fontWeight: 500 }}>
                   <AlertCircle size={14} color="var(--color-danger)" aria-hidden="true" />
                   <span>{errors.routingNumber}</span>
                 </div>
@@ -269,75 +299,60 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="achAccountNumber" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('accountNumber')}
               </label>
               <input
+                id="achAccountNumber"
                 type="text"
                 disabled={disabled}
                 placeholder="123456789"
                 maxLength={17}
                 value={details.accountNumber || ''}
                 onChange={(e) => updateField('accountNumber', e.target.value.replace(/\D/g, ''))}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.accountNumber ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.accountNumber ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.accountNumber && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.accountNumber}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.accountNumber}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="achConfirmAccountNumber" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('confirmAccountNumber')}
               </label>
               <input
+                id="achConfirmAccountNumber"
                 type="text"
                 disabled={disabled}
                 placeholder="123456789"
                 maxLength={17}
                 value={details.confirmAccountNumber || ''}
                 onChange={(e) => updateField('confirmAccountNumber', e.target.value.replace(/\D/g, ''))}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.confirmAccountNumber ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.confirmAccountNumber ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.confirmAccountNumber && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.confirmAccountNumber}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.confirmAccountNumber}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="achAccountType" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('accountType')}
               </label>
               <select
+                id="achAccountType"
                 disabled={disabled}
                 value={details.accountType || 'checking'}
                 onChange={(e) => updateField('accountType', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  outline: 'none',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box'
-                }}
+                className="fintech-select"
+                style={{ width: '100%' }}
               >
                 <option value="checking">{t('checking')}</option>
                 <option value="savings">{t('savings')}</option>
@@ -347,25 +362,18 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
         )}
 
         {selectedRail === 'digital_card' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="cardDeliveryChannel" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('deliveryChannel')}
               </label>
               <select
+                id="cardDeliveryChannel"
                 disabled={disabled}
                 value={details.deliveryChannel || 'EMAIL'}
                 onChange={(e) => updateField('deliveryChannel', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  outline: 'none',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box'
-                }}
+                className="fintech-select"
+                style={{ width: '100%' }}
               >
                 <option value="EMAIL">{t('email')}</option>
                 <option value="SMS">{t('sms')}</option>
@@ -374,74 +382,59 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
 
             {(details.deliveryChannel || 'EMAIL') === 'EMAIL' ? (
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                <label htmlFor="cardRecipientEmail" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                   {t('recipientEmail')}
                 </label>
                 <input
+                  id="cardRecipientEmail"
                   type="email"
                   disabled={disabled}
                   placeholder="claimant@example.com"
                   value={details.recipientEmail || ''}
                   onChange={(e) => updateField('recipientEmail', e.target.value)}
+                  className="fintech-input"
                   style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '6px',
-                    border: `1px solid ${errors.recipientEmail ? '#ef4444' : '#cbd5e1'}`,
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box'
+                    border: `1px solid ${errors.recipientEmail ? 'var(--color-danger)' : 'var(--border-default)'}`
                   }}
                 />
                 {errors.recipientEmail && (
-                  <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.recipientEmail}</div>
+                  <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.recipientEmail}</div>
                 )}
               </div>
             ) : (
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                <label htmlFor="cardRecipientPhone" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                   {t('recipientPhone')}
                 </label>
                 <input
+                  id="cardRecipientPhone"
                   type="tel"
                   disabled={disabled}
                   placeholder="+12055550199"
                   value={details.recipientPhone || ''}
                   onChange={(e) => updateField('recipientPhone', e.target.value)}
+                  className="fintech-input"
                   style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '6px',
-                    border: `1px solid ${errors.recipientPhone ? '#ef4444' : '#cbd5e1'}`,
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box'
+                    border: `1px solid ${errors.recipientPhone ? 'var(--color-danger)' : 'var(--border-default)'}`
                   }}
                 />
                 {errors.recipientPhone && (
-                  <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.recipientPhone}</div>
+                  <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.recipientPhone}</div>
                 )}
               </div>
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="cardBrand" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('cardBrand')}
               </label>
               <select
+                id="cardBrand"
                 disabled={disabled}
                 value={details.cardBrand || 'MASTERCARD'}
                 onChange={(e) => updateField('cardBrand', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  outline: 'none',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box'
-                }}
+                className="fintech-select"
+                style={{ width: '100%' }}
               >
                 <option value="MASTERCARD">Mastercard Prepaid</option>
                 <option value="VISA">Visa Prepaid</option>
@@ -451,286 +444,242 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
         )}
 
         {selectedRail === 'debit_card' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="debitCardholderName" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('cardholderName')}
               </label>
               <input
+                id="debitCardholderName"
                 type="text"
                 disabled={disabled}
                 placeholder={claimantName || 'Full Name'}
                 value={details.cardholderName || ''}
                 onChange={(e) => updateField('cardholderName', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.cardholderName ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.cardholderName ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.cardholderName && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.cardholderName}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.cardholderName}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="debitCardNumber" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('cardNumber')}
               </label>
               <input
+                id="debitCardNumber"
                 type="text"
                 disabled={disabled}
                 placeholder="4111 1111 1111 1111"
                 maxLength={19}
                 value={details.cardNumber || ''}
                 onChange={(e) => updateField('cardNumber', e.target.value)}
+                className="fintech-input font-mono"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.cardNumber ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.cardNumber ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.cardNumber && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.cardNumber}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.cardNumber}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="debitExpirationDate" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('expirationDate')}
               </label>
               <input
+                id="debitExpirationDate"
                 type="text"
                 disabled={disabled}
                 placeholder="12/28"
                 maxLength={7}
                 value={details.expirationDate || ''}
                 onChange={(e) => updateField('expirationDate', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.expirationDate ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.expirationDate ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.expirationDate && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.expirationDate}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.expirationDate}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="debitCvv" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('cvv')}
               </label>
               <input
+                id="debitCvv"
                 type="password"
                 disabled={disabled}
                 placeholder="123"
                 maxLength={4}
                 value={details.cvv || ''}
                 onChange={(e) => updateField('cvv', e.target.value.replace(/\D/g, ''))}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.cvv ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.cvv ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.cvv && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.cvv}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.cvv}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="debitBillingZip" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('billingZip')}
               </label>
               <input
+                id="debitBillingZip"
                 type="text"
                 disabled={disabled}
                 placeholder="90210"
                 maxLength={10}
                 value={details.billingZip || ''}
                 onChange={(e) => updateField('billingZip', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.billingZip ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.billingZip ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.billingZip && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.billingZip}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.billingZip}</div>
               )}
             </div>
           </div>
         )}
 
         {selectedRail === 'physical_check' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '16px' }}>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkRecipientName" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('recipientName')}
               </label>
               <input
+                id="checkRecipientName"
                 type="text"
                 disabled={disabled}
                 placeholder={claimantName || 'Recipient Full Legal Name'}
                 value={details.recipientName || ''}
                 onChange={(e) => updateField('recipientName', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.recipientName ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.recipientName ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.recipientName && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.recipientName}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.recipientName}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkStreet1" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('street1')}
               </label>
               <input
+                id="checkStreet1"
                 type="text"
                 disabled={disabled}
                 placeholder="100 Main Street"
                 value={details.street1 || ''}
                 onChange={(e) => updateField('street1', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.street1 ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.street1 ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.street1 && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.street1}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.street1}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkStreet2" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('street2')}
               </label>
               <input
+                id="checkStreet2"
                 type="text"
                 disabled={disabled}
                 placeholder="Apt 4B"
                 value={details.street2 || ''}
                 onChange={(e) => updateField('street2', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: '1px solid var(--border-default)'
                 }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkCity" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('city')}
               </label>
               <input
+                id="checkCity"
                 type="text"
                 disabled={disabled}
                 placeholder="Boston"
                 value={details.city || ''}
                 onChange={(e) => updateField('city', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.city ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.city ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.city && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.city}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.city}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkState" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('state')}
               </label>
               <input
+                id="checkState"
                 type="text"
                 disabled={disabled}
                 placeholder="MA"
                 maxLength={2}
                 value={details.state || ''}
                 onChange={(e) => updateField('state', e.target.value.toUpperCase())}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.state ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.state ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.state && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.state}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.state}</div>
               )}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label htmlFor="checkZip" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
                 {t('zip')}
               </label>
               <input
+                id="checkZip"
                 type="text"
                 disabled={disabled}
                 placeholder="02108"
                 maxLength={10}
                 value={details.zip || ''}
                 onChange={(e) => updateField('zip', e.target.value)}
+                className="fintech-input"
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.zip ? '#ef4444' : '#cbd5e1'}`,
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
+                  border: `1px solid ${errors.zip ? 'var(--color-danger)' : 'var(--border-default)'}`
                 }}
               />
               {errors.zip && (
-                <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.zip}</div>
+                <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.zip}</div>
               )}
             </div>
           </div>
@@ -738,109 +687,92 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
 
         {selectedRail === 'paypal' && (
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+            <label htmlFor="paypalAccount" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
               {t('paypalAccount')}
             </label>
             <input
+              id="paypalAccount"
               type="text"
               disabled={disabled}
               placeholder="user@example.com or +12055550199"
               value={details.paypalAccount || ''}
               onChange={(e) => updateField('paypalAccount', e.target.value)}
+              className="fintech-input"
               style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: `1px solid ${errors.paypalAccount ? '#ef4444' : '#cbd5e1'}`,
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box'
+                border: `1px solid ${errors.paypalAccount ? 'var(--color-danger)' : 'var(--border-default)'}`
               }}
             />
             {errors.paypalAccount && (
-              <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.paypalAccount}</div>
+              <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.paypalAccount}</div>
             )}
           </div>
         )}
 
         {selectedRail === 'venmo' && (
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+            <label htmlFor="venmoIdentifier" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
               {t('venmoIdentifier')}
             </label>
             <input
+              id="venmoIdentifier"
               type="text"
               disabled={disabled}
               placeholder="@username or +12055550199"
               value={details.venmoIdentifier || ''}
               onChange={(e) => updateField('venmoIdentifier', e.target.value)}
+              className="fintech-input"
               style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: `1px solid ${errors.venmoIdentifier ? '#ef4444' : '#cbd5e1'}`,
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box'
+                border: `1px solid ${errors.venmoIdentifier ? 'var(--color-danger)' : 'var(--border-default)'}`
               }}
             />
             {errors.venmoIdentifier && (
-              <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.venmoIdentifier}</div>
+              <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.venmoIdentifier}</div>
             )}
           </div>
         )}
 
         {selectedRail === 'zelle' && (
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+            <label htmlFor="zelleRecipient" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
               {t('zelleRecipient')}
             </label>
             <input
+              id="zelleRecipient"
               type="text"
               disabled={disabled}
               placeholder="enrolled@example.com or +12055550199"
               value={details.zelleRecipient || ''}
               onChange={(e) => updateField('zelleRecipient', e.target.value)}
+              className="fintech-input"
               style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: `1px solid ${errors.zelleRecipient ? '#ef4444' : '#cbd5e1'}`,
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box'
+                border: `1px solid ${errors.zelleRecipient ? 'var(--color-danger)' : 'var(--border-default)'}`
               }}
             />
             {errors.zelleRecipient && (
-              <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.zelleRecipient}</div>
+              <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.zelleRecipient}</div>
             )}
           </div>
         )}
 
         {selectedRail === 'bitcoin' && (
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+            <label htmlFor="bitcoinAddress" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
               {t('bitcoinAddress')}
             </label>
             <input
+              id="bitcoinAddress"
               type="text"
               disabled={disabled}
               placeholder="bc1q... or 1... or 3..."
               value={details.bitcoinAddress || ''}
               onChange={(e) => updateField('bitcoinAddress', e.target.value.trim())}
+              className="fintech-input font-mono break-all"
               style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '6px',
-                border: `1px solid ${errors.bitcoinAddress ? '#ef4444' : '#cbd5e1'}`,
-                fontSize: '14px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'monospace'
+                border: `1px solid ${errors.bitcoinAddress ? 'var(--color-danger)' : 'var(--border-default)'}`
               }}
             />
             {errors.bitcoinAddress && (
-              <div style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.bitcoinAddress}</div>
+              <div role="alert" aria-live="polite" style={{ fontSize: '12px', color: 'var(--color-danger)', marginTop: '4px' }}>{errors.bitcoinAddress}</div>
             )}
             <div
               style={{
@@ -849,14 +781,14 @@ export const PaymentRailSelector: React.FC<PaymentRailSelectorProps> = ({
                 gap: '8px',
                 marginTop: '10px',
                 fontSize: '12px',
-                color: '#b45309',
-                backgroundColor: '#fffbeb',
+                color: 'var(--color-warning-text)',
+                backgroundColor: 'var(--color-warning-bg)',
                 padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid #fde68a'
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-warning-border)'
               }}
             >
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <AlertCircle size={16} style={{ flexShrink: 0 }} aria-hidden="true" />
               <span>{t('bitcoinWarning')}</span>
             </div>
           </div>

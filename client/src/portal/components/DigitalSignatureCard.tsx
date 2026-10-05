@@ -28,11 +28,11 @@ export const DigitalSignatureCard: React.FC<DigitalSignatureCardProps> = ({
 }) => {
   return (
     <div
-      className="fintech-card"
+      className="fintech-card break-words"
       role="region"
       aria-label="Digital Signature and Affirmation"
       style={{
-        padding: '28px',
+        padding: 'clamp(18px, 3.5vw, 28px)',
         marginBottom: '28px',
         background: 'linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)'
       }}

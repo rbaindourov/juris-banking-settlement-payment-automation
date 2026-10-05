@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   AlertTriangle,
@@ -41,6 +41,54 @@ export const ExceptionResolutionModal: React.FC<ExceptionResolutionModalProps> =
   const [city, setCity] = useState('');
   const [stateCode, setStateCode] = useState('CA');
   const [zip, setZip] = useState('');
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Accessible Focus Trap & Escape Dismissal
+  useEffect(() => {
+    const modalEl = modalRef.current;
+    if (!modalEl) return;
+
+    // Auto-focus first focusable element
+    const focusables = modalEl.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length > 0) {
+      focusables[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const currentFocusables = Array.from(modalEl.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((el) => el.offsetParent !== null);
+
+        if (currentFocusables.length === 0) return;
+        const first = currentFocusables[0];
+        const last = currentFocusables[currentFocusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,136 +135,266 @@ export const ExceptionResolutionModal: React.FC<ExceptionResolutionModalProps> =
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4"
+      ref={modalRef}
+      className="modal-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      aria-labelledby="exception-modal-title"
+      style={{ zIndex: 9999 }}
     >
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div
+        className="modal-container"
+        style={{
+          maxWidth: '560px',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-amber-100 text-amber-800 rounded-lg">
-              <AlertTriangle className="w-5 h-5" />
+        <div
+          style={{
+            padding: '18px 24px',
+            borderBottom: '1px solid var(--border-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'var(--bg-body)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--color-warning-bg)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px solid var(--color-warning-border)'
+              }}
+            >
+              <AlertTriangle size={18} color="var(--color-warning)" aria-hidden="true" />
             </div>
             <div>
-              <h2 id="modal-title" className="text-base font-bold text-slate-900">
+              <h2
+                id="exception-modal-title"
+                style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}
+              >
                 Resolve Exception: {exception.claimId}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
                 Return Code: {exception.returnCode || exception.errorCode || 'UNKNOWN'}
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-200 transition-colors"
             aria-label="Close dialog"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              width: '44px',
+              height: '44px',
+              minWidth: '44px',
+              minHeight: '44px',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            <X className="w-5 h-5" />
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5">
+        <form onSubmit={handleSubmit} style={{ padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {errorMessage && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <div
+              role="alert"
+              aria-live="assertive"
+              style={{
+                padding: '12px 14px',
+                backgroundColor: 'var(--color-danger-bg)',
+                border: '1px solid var(--color-danger-border)',
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--color-danger-text)',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px'
+              }}
+            >
+              <AlertTriangle size={16} color="var(--color-danger)" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* Exception Context */}
-          <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
-            <div className="flex justify-between text-slate-600">
+          <div
+            style={{
+              padding: '14px 16px',
+              backgroundColor: 'var(--bg-card-subtle)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
               <span>Claimant:</span>
-              <span className="font-semibold text-slate-900">{exception.claimantName || 'N/A'}</span>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{exception.claimantName || 'N/A'}</span>
             </div>
-            <div className="flex justify-between text-slate-600">
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
               <span>Amount:</span>
-              <span className="font-semibold text-slate-900">${(exception.amount || 0).toFixed(2)}</span>
+              <span style={{ fontWeight: 700, color: 'var(--color-indigo)', fontVariantNumeric: 'tabular-nums' }}>
+                ${(exception.amount || 0).toFixed(2)}
+              </span>
             </div>
-            <div className="flex justify-between text-slate-600">
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
               <span>Reason:</span>
-              <span className="text-slate-700 font-medium">{exception.returnReason || exception.errorMessage || 'Banking exception'}</span>
+              <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>
+                {exception.returnReason || exception.errorMessage || 'Banking exception'}
+              </span>
             </div>
           </div>
 
           {/* Action Selector */}
           <div>
-            <label className="block text-xs font-bold uppercase text-slate-700 mb-2">
+            <label
+              style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: 'var(--text-secondary)',
+                marginBottom: '8px'
+              }}
+            >
               Select Resolution Action
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div
+              role="radiogroup"
+              aria-label="Resolution Action"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+                gap: '10px'
+              }}
+            >
               <button
                 type="button"
+                role="radio"
+                aria-checked={action === 'switch_to_check'}
                 onClick={() => setAction('switch_to_check')}
-                className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all ${
-                  action === 'switch_to_check'
-                    ? 'border-blue-600 bg-blue-50/50 text-blue-900 shadow-sm ring-1 ring-blue-600'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  border: action === 'switch_to_check' ? '2px solid var(--color-indigo)' : '1px solid var(--border-subtle)',
+                  backgroundColor: action === 'switch_to_check' ? 'var(--bg-active)' : 'var(--bg-card)',
+                  transition: 'all 0.15s ease'
+                }}
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: action === 'switch_to_check' ? 'var(--color-indigo)' : 'var(--text-primary)' }}>
+                  <Building2 size={16} aria-hidden="true" />
                   <span>Switch to Check</span>
                 </div>
-                <span className="text-[11px] text-slate-500">
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   Mail physical check to address
                 </span>
               </button>
 
               <button
                 type="button"
+                role="radio"
+                aria-checked={action === 'resend_email'}
                 onClick={() => setAction('resend_email')}
-                className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all ${
-                  action === 'resend_email'
-                    ? 'border-blue-600 bg-blue-50/50 text-blue-900 shadow-sm ring-1 ring-blue-600'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  border: action === 'resend_email' ? '2px solid var(--color-indigo)' : '1px solid var(--border-subtle)',
+                  backgroundColor: action === 'resend_email' ? 'var(--bg-active)' : 'var(--bg-card)',
+                  transition: 'all 0.15s ease'
+                }}
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <Mail className="w-3.5 h-3.5 text-blue-600" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: action === 'resend_email' ? 'var(--color-indigo)' : 'var(--text-primary)' }}>
+                  <Mail size={16} aria-hidden="true" />
                   <span>Resend Email</span>
                 </div>
-                <span className="text-[11px] text-slate-500">
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   Issue fresh magic link portal token
                 </span>
               </button>
 
               <button
                 type="button"
+                role="radio"
+                aria-checked={action === 'requeue_sftp'}
                 onClick={() => setAction('requeue_sftp')}
-                className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all ${
-                  action === 'requeue_sftp'
-                    ? 'border-blue-600 bg-blue-50/50 text-blue-900 shadow-sm ring-1 ring-blue-600'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  border: action === 'requeue_sftp' ? '2px solid var(--color-indigo)' : '1px solid var(--border-subtle)',
+                  backgroundColor: action === 'requeue_sftp' ? 'var(--bg-active)' : 'var(--bg-card)',
+                  transition: 'all 0.15s ease'
+                }}
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <Send className="w-3.5 h-3.5 text-blue-600" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: action === 'requeue_sftp' ? 'var(--color-indigo)' : 'var(--text-primary)' }}>
+                  <Send size={16} aria-hidden="true" />
                   <span>Requeue SFTP</span>
                 </div>
-                <span className="text-[11px] text-slate-500">
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   Re-queue for next batch payout
                 </span>
               </button>
 
               <button
                 type="button"
+                role="radio"
+                aria-checked={action === 'mark_resolved'}
                 onClick={() => setAction('mark_resolved')}
-                className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all ${
-                  action === 'mark_resolved'
-                    ? 'border-blue-600 bg-blue-50/50 text-blue-900 shadow-sm ring-1 ring-blue-600'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-                }`}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  border: action === 'mark_resolved' ? '2px solid var(--color-indigo)' : '1px solid var(--border-subtle)',
+                  backgroundColor: action === 'mark_resolved' ? 'var(--bg-active)' : 'var(--bg-card)',
+                  transition: 'all 0.15s ease'
+                }}
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: action === 'mark_resolved' ? 'var(--color-indigo)' : 'var(--text-primary)' }}>
+                  <CheckCircle2 size={16} color="var(--color-success)" aria-hidden="true" />
                   <span>Mark Resolved</span>
                 </div>
-                <span className="text-[11px] text-slate-500">
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   Manual escrow or offline payment
                 </span>
               </button>
@@ -225,76 +403,123 @@ export const ExceptionResolutionModal: React.FC<ExceptionResolutionModalProps> =
 
           {/* Conditional Physical Address Fields */}
           {action === 'switch_to_check' && (
-            <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-lg">
-              <h4 className="text-xs font-bold uppercase text-slate-700">
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                padding: '16px',
+                backgroundColor: 'var(--bg-card-subtle)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  color: 'var(--text-secondary)',
+                  margin: 0
+                }}
+              >
                 Mailing Address for Physical Check
               </h4>
+
               <div>
-                <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                  Street Address 1 *
+                <label
+                  htmlFor="exStreet1"
+                  style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}
+                >
+                  Street Address Line 1 *
                 </label>
                 <input
+                  id="exStreet1"
                   type="text"
                   required
                   value={street1}
                   onChange={(e) => setStreet1(e.target.value)}
                   placeholder="123 Main Street"
-                  className="w-full text-xs p-2 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="fintech-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '8px 12px' }}
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                  Street Address 2 (Apt / Suite)
+                <label
+                  htmlFor="exStreet2"
+                  style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}
+                >
+                  Street Address Line 2 (Apt / Suite)
                 </label>
                 <input
+                  id="exStreet2"
                   type="text"
                   value={street2}
                   onChange={(e) => setStreet2(e.target.value)}
                   placeholder="Apt 4B"
-                  className="w-full text-xs p-2 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="fintech-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '8px 12px' }}
                 />
               </div>
 
-              <div className="grid grid-cols-6 gap-2">
-                <div className="col-span-3">
-                  <label className="block text-[11px] font-medium text-slate-600 mb-1">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '10px' }}>
+                <div>
+                  <label
+                    htmlFor="exCity"
+                    style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}
+                  >
                     City *
                   </label>
                   <input
+                    id="exCity"
                     type="text"
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="San Francisco"
-                    className="w-full text-xs p-2 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                    className="fintech-input"
+                    style={{ width: '100%', fontSize: '13px', padding: '8px 12px' }}
                   />
                 </div>
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-medium text-slate-600 mb-1">
+
+                <div>
+                  <label
+                    htmlFor="exState"
+                    style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}
+                  >
                     State *
                   </label>
                   <input
+                    id="exState"
                     type="text"
                     required
                     maxLength={2}
                     value={stateCode}
                     onChange={(e) => setStateCode(e.target.value.toUpperCase())}
                     placeholder="CA"
-                    className="w-full text-xs p-2 bg-white border border-slate-300 rounded text-center focus:ring-1 focus:ring-blue-500"
+                    className="fintech-input"
+                    style={{ width: '100%', fontSize: '13px', padding: '8px 12px', textAlign: 'center' }}
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-[11px] font-medium text-slate-600 mb-1">
-                    ZIP *
+
+                <div>
+                  <label
+                    htmlFor="exZip"
+                    style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}
+                  >
+                    ZIP Code *
                   </label>
                   <input
+                    id="exZip"
                     type="text"
                     required
                     value={zip}
                     onChange={(e) => setZip(e.target.value)}
                     placeholder="94105"
-                    className="w-full text-xs p-2 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                    className="fintech-input"
+                    style={{ width: '100%', fontSize: '13px', padding: '8px 12px' }}
                   />
                 </div>
               </div>
@@ -303,36 +528,60 @@ export const ExceptionResolutionModal: React.FC<ExceptionResolutionModalProps> =
 
           {/* Audit Reason Textarea */}
           <div>
-            <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+            <label
+              htmlFor="exReason"
+              style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: 'var(--text-secondary)',
+                marginBottom: '6px'
+              }}
+            >
               Resolution Audit Notes / Reason
             </label>
             <textarea
+              id="exReason"
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Account closed by claimant; verified new mailing address for physical check."
-              className="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-blue-500"
+              className="fintech-input"
+              style={{ width: '100%', fontSize: '13px', padding: '10px 12px', resize: 'vertical' }}
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              paddingTop: '16px',
+              borderTop: '1px solid var(--border-subtle)'
+            }}
+          >
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              className="btn-secondary"
+              style={{ fontSize: '13px', padding: '8px 16px' }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+              className="btn-primary"
+              style={{ fontSize: '13px', padding: '8px 18px', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 size={14} className="animate-spin" aria-hidden="true" />
                   <span>Processing...</span>
                 </>
               ) : (

@@ -263,20 +263,17 @@ export const ClaimantPortalPage: React.FC = () => {
         {/* Landing Page Headline & Intro Copy */}
         {caseData.landingPageText && (
           <div
+            className="fintech-card"
             style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0',
               padding: '24px',
-              marginBottom: '24px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+              marginBottom: '24px'
             }}
           >
-            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
               {caseData.landingPageText.headline || t('portalTitle')}
             </h2>
             <div
-              style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6 }}
+              style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}
               dangerouslySetInnerHTML={{ __html: caseData.landingPageText.introHtml }}
             />
           </div>
@@ -287,6 +284,8 @@ export const ClaimantPortalPage: React.FC = () => {
           <>
             {submitError && (
               <div
+                role="alert"
+                aria-live="assertive"
                 style={{
                   backgroundColor: '#fef2f2',
                   border: '1px solid #fecaca',
@@ -333,18 +332,15 @@ export const ClaimantPortalPage: React.FC = () => {
         {/* FAQ Accordion Section */}
         {caseData.landingPageText?.faqAccordion && caseData.landingPageText.faqAccordion.length > 0 && (
           <div
+            className="fintech-card"
             style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0',
               padding: '24px',
-              marginBottom: '24px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
+              marginBottom: '24px'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <HelpCircle size={20} color="#1e3a8a" />
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+              <HelpCircle size={20} color="var(--color-primary)" />
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                 {t('faqTitle')}
               </h3>
             </div>
@@ -355,13 +351,16 @@ export const ClaimantPortalPage: React.FC = () => {
                   <div
                     key={idx}
                     style={{
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-md)',
                       overflow: 'hidden'
                     }}
                   >
                     <button
                       type="button"
+                      id={`faq-question-${idx}`}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${idx}`}
                       onClick={() => toggleFaq(idx)}
                       style={{
                         width: '100%',
@@ -369,26 +368,29 @@ export const ClaimantPortalPage: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         padding: '14px 18px',
-                        backgroundColor: isOpen ? '#f8fafc' : '#ffffff',
+                        backgroundColor: isOpen ? 'var(--bg-body)' : 'var(--bg-card)',
                         border: 'none',
                         cursor: 'pointer',
                         textAlign: 'left',
                         fontSize: '14px',
                         fontWeight: 600,
-                        color: '#1e293b'
+                        color: 'var(--text-primary)'
                       }}
                     >
                       <span>{faq.question}</span>
-                      {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      {isOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
                     </button>
                     {isOpen && (
                       <div
+                        id={`faq-answer-${idx}`}
+                        role="region"
+                        aria-labelledby={`faq-question-${idx}`}
                         style={{
                           padding: '14px 18px',
-                          borderTop: '1px solid #f1f5f9',
-                          backgroundColor: '#ffffff',
+                          borderTop: '1px solid var(--border-subtle)',
+                          backgroundColor: 'var(--bg-card)',
                           fontSize: '14px',
-                          color: '#475569',
+                          color: 'var(--text-secondary)',
                           lineHeight: 1.6
                         }}
                         dangerouslySetInnerHTML={{ __html: faq.answer }}

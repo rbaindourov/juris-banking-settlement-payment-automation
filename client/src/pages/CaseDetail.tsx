@@ -135,10 +135,39 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
     return (
       <div style={{ padding: '32px', textAlign: 'center' }}>
         <p style={{ color: '#dc2626' }}>Case not found</p>
-        <button onClick={onBack} style={{ marginTop: '16px', padding: '8px 16px' }}>Back to cases</button>
+        <button type="button" onClick={onBack} className="btn-secondary" style={{ marginTop: '16px', minHeight: '44px' }}>Back to cases</button>
       </div>
     );
   }
+
+  type CaseTabId = 'analytics' | 'ingestion' | 'claimants' | 'templates' | 'settings';
+  const TAB_ORDER: CaseTabId[] = ['analytics', 'ingestion', 'claimants', 'templates', 'settings'];
+
+  const handleTabKeyDown = (e: React.KeyboardEvent, currentTab: CaseTabId) => {
+    const currentIndex = TAB_ORDER.indexOf(currentTab);
+    let nextIndex = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      nextIndex = (currentIndex + 1) % TAB_ORDER.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      nextIndex = (currentIndex - 1 + TAB_ORDER.length) % TAB_ORDER.length;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      nextIndex = TAB_ORDER.length - 1;
+    }
+
+    if (nextIndex >= 0) {
+      const nextTab = TAB_ORDER[nextIndex];
+      setActiveTab(nextTab);
+      setTimeout(() => {
+        document.getElementById(`tab-${nextTab}`)?.focus();
+      }, 0);
+    }
+  };
 
   return (
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '32px 24px' }}>
@@ -157,7 +186,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           fontSize: '14px',
           fontWeight: 600,
           marginBottom: '20px',
-          padding: '4px 8px',
+          minHeight: '44px',
+          padding: '8px 14px',
           borderRadius: 'var(--radius-sm)',
           transition: 'color 0.15s ease'
         }}
@@ -244,6 +274,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           aria-controls="panel-analytics"
           tabIndex={activeTab === 'analytics' ? 0 : -1}
           onClick={() => setActiveTab('analytics')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'analytics')}
           className={`fintech-tab-item ${activeTab === 'analytics' ? 'active' : ''}`}
         >
           <BarChart3 size={16} aria-hidden="true" />
@@ -258,6 +289,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           aria-controls="panel-ingestion"
           tabIndex={activeTab === 'ingestion' ? 0 : -1}
           onClick={() => setActiveTab('ingestion')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'ingestion')}
           className={`fintech-tab-item ${activeTab === 'ingestion' ? 'active' : ''}`}
         >
           <DollarSign size={16} aria-hidden="true" />
@@ -272,6 +304,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           aria-controls="panel-claimants"
           tabIndex={activeTab === 'claimants' ? 0 : -1}
           onClick={() => setActiveTab('claimants')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'claimants')}
           className={`fintech-tab-item ${activeTab === 'claimants' ? 'active' : ''}`}
         >
           <Users size={16} aria-hidden="true" />
@@ -298,6 +331,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           aria-controls="panel-templates"
           tabIndex={activeTab === 'templates' ? 0 : -1}
           onClick={() => setActiveTab('templates')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'templates')}
           className={`fintech-tab-item ${activeTab === 'templates' ? 'active' : ''}`}
         >
           <Mail size={16} aria-hidden="true" />
@@ -312,6 +346,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
           aria-controls="panel-settings"
           tabIndex={activeTab === 'settings' ? 0 : -1}
           onClick={() => setActiveTab('settings')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'settings')}
           className={`fintech-tab-item ${activeTab === 'settings' ? 'active' : ''}`}
         >
           <Settings size={16} aria-hidden="true" />
@@ -321,12 +356,14 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
 
       {saveSuccessMsg && (
         <div
+          role="status"
+          aria-live="polite"
           style={{
             padding: '12px 16px',
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            borderRadius: '8px',
-            color: '#166534',
+            backgroundColor: 'var(--color-success-bg)',
+            border: '1px solid var(--color-success-border)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--color-success-text)',
             fontSize: '13px',
             display: 'flex',
             alignItems: 'center',
@@ -334,19 +371,21 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
             marginBottom: '20px'
           }}
         >
-          <CheckCircle2 size={16} color="#16a34a" />
+          <CheckCircle2 size={16} color="var(--color-success)" aria-hidden="true" />
           <span>{saveSuccessMsg}</span>
         </div>
       )}
 
       {errorMsg && (
         <div
+          role="alert"
+          aria-live="assertive"
           style={{
             padding: '12px 16px',
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '8px',
-            color: '#991b1b',
+            backgroundColor: 'var(--color-danger-bg)',
+            border: '1px solid var(--color-danger-border)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--color-danger-text)',
             fontSize: '13px',
             display: 'flex',
             alignItems: 'center',
@@ -354,23 +393,31 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
             marginBottom: '20px'
           }}
         >
-          <AlertCircle size={16} color="#dc2626" />
+          <AlertCircle size={16} color="var(--color-danger)" aria-hidden="true" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {/* Tab 0: Analytics Dashboard & Exception Ledger */}
       {activeTab === 'analytics' && (
-        <CaseAnalyticsDashboard
-          caseId={caseId}
-          settlementCase={settlementCase}
-          onRefreshCase={fetchCase}
-        />
+        <div role="tabpanel" id="panel-analytics" aria-labelledby="tab-analytics">
+          <CaseAnalyticsDashboard
+            caseId={caseId}
+            settlementCase={settlementCase}
+            onRefreshCase={fetchCase}
+          />
+        </div>
       )}
 
       {/* Tab 1: Ingestion */}
       {activeTab === 'ingestion' && (
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
+        <div
+          role="tabpanel"
+          id="panel-ingestion"
+          aria-labelledby="tab-ingestion"
+          className="fintech-card"
+          style={{ padding: '24px' }}
+        >
           <ClaimantIngestion
             settlementCase={settlementCase}
             onCommitSuccess={() => {
@@ -383,35 +430,38 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
 
       {/* Tab 2: Claimant Records Directory */}
       {activeTab === 'claimants' && (
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
+        <div
+          role="tabpanel"
+          id="panel-claimants"
+          aria-labelledby="tab-claimants"
+          className="fintech-card"
+          style={{ padding: '24px' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)' }}>
               Enrolled Claimants ({claimantTotal})
             </h3>
             <input
+              id="claimantDirectorySearch"
               type="text"
+              aria-label="Search by name, email, claim ID"
               placeholder="Search by name, email, claim ID..."
               value={claimantSearch}
               onChange={(e) => setClaimantSearch(e.target.value)}
-              style={{
-                padding: '8px 14px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                fontSize: '13px',
-                width: '280px'
-              }}
+              className="fintech-input"
+              style={{ width: '280px' }}
             />
           </div>
 
           {claimants.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
               No claimants committed yet. Use the Roster Ingestion tab to upload records.
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#f8fafc', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
+                  <tr style={{ backgroundColor: 'var(--bg-body)', textAlign: 'left', borderBottom: '1px solid var(--border-subtle)' }}>
                     <th style={{ padding: '10px 16px' }}>Claim ID</th>
                     <th style={{ padding: '10px 16px' }}>Claimant Name</th>
                     <th style={{ padding: '10px 16px' }}>Email</th>
@@ -423,21 +473,14 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
                 </thead>
                 <tbody>
                   {claimants.map((cl) => (
-                    <tr key={cl.id || cl._id!} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '10px 16px', fontWeight: 600 }}>{cl.claimId}</td>
+                    <tr key={cl.id || cl._id!} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <td style={{ padding: '10px 16px', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{cl.claimId}</td>
                       <td style={{ padding: '10px 16px' }}>{`${cl.firstName} ${cl.lastName}`}</td>
-                      <td style={{ padding: '10px 16px', color: '#64748b' }}>{cl.email}</td>
-                      <td style={{ padding: '10px 16px', fontWeight: 600 }}>${cl.settlementAmount?.toFixed(2)}</td>
+                      <td style={{ padding: '10px 16px', color: 'var(--text-muted)' }}>{cl.email}</td>
+                      <td style={{ padding: '10px 16px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>${cl.settlementAmount?.toFixed(2)}</td>
                       <td style={{ padding: '10px 16px' }}>
                         <span
-                          style={{
-                            padding: '2px 8px',
-                            borderRadius: '12px',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            backgroundColor: cl.status === 'selected' ? '#dcfce7' : '#f1f5f9',
-                            color: cl.status === 'selected' ? '#166534' : '#475569'
-                          }}
+                          className={`status-pill ${cl.status === 'selected' ? 'status-pill-success' : 'status-pill-neutral'}`}
                         >
                           {cl.status}
                         </span>
@@ -445,7 +488,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
                       <td style={{ padding: '10px 16px' }}>
                         {cl.selectedPaymentMethod ? cl.selectedPaymentMethod.toUpperCase() : '—'}
                       </td>
-                      <td style={{ padding: '10px 16px', fontFamily: 'monospace', fontSize: '11px', color: '#64748b' }}>
+                      <td style={{ padding: '10px 16px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
                         {cl.paymentSelectionToken ? `${cl.paymentSelectionToken.slice(0, 12)}...` : '—'}
                       </td>
                     </tr>
@@ -459,27 +502,27 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
 
       {/* Tab 3: Quill Template Designer */}
       {activeTab === 'templates' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', marginBottom: '16px' }}>
+        <div
+          role="tabpanel"
+          id="panel-templates"
+          aria-labelledby="tab-templates"
+          style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
+        >
+          <div className="fintech-card" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
               Notice Email Subject & Body
             </h3>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+              <label htmlFor="emailSubject" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
                 Email Subject Line
               </label>
               <input
+                id="emailSubject"
                 type="text"
                 value={emailSubject}
                 onChange={(e) => setEmailSubject(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px'
-                }}
+                className="fintech-input"
               />
             </div>
 
@@ -493,8 +536,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
             />
           </div>
 
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', marginBottom: '16px' }}>
+          <div className="fintech-card" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
               Claimant Portal Landing Page Copy
             </h3>
 
@@ -513,20 +556,10 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
               type="button"
               onClick={handleSaveTemplates}
               disabled={isSavingTemplate}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 24px',
-                backgroundColor: '#1e3a8a',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600
-              }}
+              className="btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px' }}
             >
-              <Save size={16} />
+              <Save size={16} aria-hidden="true" />
               {isSavingTemplate ? 'Saving & Sanitizing...' : 'Save Templates'}
             </button>
           </div>
@@ -535,29 +568,30 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
 
       {/* Tab 4: Deadline & Settings */}
       {activeTab === 'settings' && (
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', marginBottom: '16px' }}>
+        <div
+          role="tabpanel"
+          id="panel-settings"
+          aria-labelledby="tab-settings"
+          className="fintech-card"
+          style={{ padding: '24px' }}
+        >
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
             Case Deadline & Administration
           </h3>
 
           <div style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+              <label htmlFor="caseDeadlineSetting" style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
                 Disbursement & Election Deadline
               </label>
               <input
+                id="caseDeadlineSetting"
                 type="datetime-local"
                 value={editDeadline}
                 onChange={(e) => setEditDeadline(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #cbd5e1',
-                  fontSize: '14px'
-                }}
+                className="fintech-input"
               />
-              <span style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', display: 'block' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
                 Upon deadline expiration, unselected claimants are transitioned to the fallback payment rail.
               </span>
             </div>
@@ -566,21 +600,10 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
               type="button"
               onClick={handleSaveDeadline}
               disabled={isSavingSettings}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '10px 18px',
-                backgroundColor: '#1e3a8a',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600
-              }}
+              className="btn-primary"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 18px' }}
             >
-              <Save size={16} />
+              <Save size={16} aria-hidden="true" />
               {isSavingSettings ? 'Updating...' : 'Update Deadline'}
             </button>
           </div>

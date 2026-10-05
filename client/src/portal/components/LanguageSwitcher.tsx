@@ -26,21 +26,18 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-      <Globe size={16} color="#475569" />
+      <Globe size={16} color="#475569" aria-hidden="true" />
       <select
         value={currentLang}
         onChange={(e) => onChangeLang(e.target.value as LanguageCode)}
         aria-label="Select portal language"
+        className="fintech-select"
         style={{
-          padding: '4px 8px',
+          minHeight: '44px',
+          padding: '8px 26px 8px 10px',
           fontSize: '13px',
-          borderRadius: '6px',
-          border: '1px solid #cbd5e1',
-          backgroundColor: '#ffffff',
-          color: '#1e293b',
           cursor: 'pointer',
-          outline: 'none',
-          fontWeight: 500
+          fontWeight: 600
         }}
       >
         {availableLangs.map((code) => (

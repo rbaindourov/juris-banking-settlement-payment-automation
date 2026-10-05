@@ -25,7 +25,7 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
       style={{
         backgroundColor: '#ffffff',
         borderBottom: '1px solid var(--border-subtle)',
-        padding: '16px 28px',
+        padding: '14px clamp(12px, 3vw, 24px)',
         boxShadow: 'var(--shadow-xs)',
         position: 'sticky',
         top: 0,
@@ -40,11 +40,11 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
           flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '16px'
+          gap: '12px'
         }}
       >
         {/* Left: Branding & Case Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: '1 1 auto' }}>
           <div
             style={{
               width: '42px',
@@ -61,9 +61,9 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
           >
             <ShieldCheck size={24} aria-hidden="true" />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', wordBreak: 'break-word' }}>
                 {caseData.name || caseData.caseName || 'Settlement Administration'}
               </span>
               {caseData.docketNumber && (
@@ -84,7 +84,7 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
               )}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>&bull; Verified Court-Authorized Portal</span>
+              <span style={{ color: 'var(--color-success-text)', fontWeight: 600 }}>&bull; Verified Court-Authorized Portal</span>
               <span>&bull;</span>
               <span>Juris Banking Settlement Administration</span>
             </div>

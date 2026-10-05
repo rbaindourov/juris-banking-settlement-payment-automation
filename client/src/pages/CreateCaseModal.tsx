@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Briefcase, DollarSign, Calendar, ShieldCheck } from 'lucide-react';
 import { Case, FallbackPaymentMethod } from '../types';
 import { caseApi } from '../services/api';
@@ -23,6 +23,54 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({
   const [defaultLanguage, setDefaultLanguage] = useState('en');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modalEl = modalRef.current;
+    if (!modalEl) return;
+
+    const focusables = modalEl.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length > 0) {
+      focusables[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const currentFocusables = Array.from(modalEl.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((el) => el.offsetParent !== null);
+
+        if (currentFocusables.length === 0) return;
+        const first = currentFocusables[0];
+        const last = currentFocusables[currentFocusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -77,64 +125,72 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({
 
   return (
     <div
+      ref={modalRef}
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-case-title"
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '20px'
+        zIndex: 9999
       }}
     >
       <div
+        className="modal-container"
         style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          width: '100%',
-          maxWidth: '560px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+          maxWidth: '580px',
           overflow: 'hidden'
         }}
       >
         <div
           style={{
-            padding: '16px 24px',
-            borderBottom: '1px solid #e2e8f0',
+            padding: '18px 24px',
+            borderBottom: '1px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: '#f8fafc'
+            backgroundColor: 'var(--bg-body)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Briefcase size={20} color="#1e3a8a" />
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Briefcase size={20} color="var(--color-primary)" aria-hidden="true" />
+            <h3 id="create-case-title" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
               Create Settlement Case
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#64748b' }}
+            aria-label="Close dialog"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              width: '44px',
+              height: '44px',
+              minWidth: '44px',
+              minHeight: '44px',
+              borderRadius: 'var(--radius-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {errorMsg && (
             <div
+              role="alert"
+              aria-live="assertive"
               style={{
-                padding: '12px',
-                backgroundColor: '#fef2f2',
-                border: '1px solid #fecaca',
-                borderRadius: '6px',
-                color: '#991b1b',
+                padding: '12px 16px',
+                backgroundColor: 'var(--color-danger-bg)',
+                border: '1px solid var(--color-danger-border)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-danger-text)',
                 fontSize: '13px'
               }}
             >
@@ -143,89 +199,100 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({
           )}
 
           <div>
-            <label style={labelStyle}>Case / Litigation Name</label>
+            <label htmlFor="caseName" style={labelStyle}>Case / Litigation Name</label>
             <input
+              id="caseName"
               type="text"
               required
               placeholder="e.g. In re Nexus Consumer Privacy Settlement"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              style={inputStyle}
+              className="fintech-input"
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
             <div>
-              <label style={labelStyle}>Docket / Matter Number</label>
+              <label htmlFor="caseDocketNumber" style={labelStyle}>Docket / Matter Number</label>
               <input
+                id="caseDocketNumber"
                 type="text"
                 required
                 placeholder="e.g. 3:24-cv-09821"
                 value={docketNumber}
                 onChange={(e) => setDocketNumber(e.target.value)}
-                style={inputStyle}
+                className="fintech-input"
+                style={{ fontFamily: 'var(--font-mono)' }}
               />
             </div>
 
             <div>
-              <label style={labelStyle}>Law Firm ID</label>
+              <label htmlFor="caseLawFirmId" style={labelStyle}>Law Firm ID</label>
               <input
+                id="caseLawFirmId"
                 type="text"
                 placeholder="firm-law-01"
                 value={lawFirmId}
                 onChange={(e) => setLawFirmId(e.target.value)}
-                style={inputStyle}
+                className="fintech-input"
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
             <div>
-              <label style={labelStyle}>Approved Settlement Fund ($)</label>
+              <label htmlFor="caseSettlementFundTotal" style={labelStyle}>Approved Settlement Fund ($)</label>
               <div style={{ position: 'relative' }}>
                 <DollarSign
                   size={16}
-                  color="#64748b"
-                  style={{ position: 'absolute', left: '10px', top: '10px' }}
+                  color="var(--text-muted)"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '12px', top: '12px' }}
                 />
                 <input
+                  id="caseSettlementFundTotal"
                   type="number"
                   step="0.01"
                   required
                   placeholder="250000.00"
                   value={settlementFundTotal}
                   onChange={(e) => setSettlementFundTotal(e.target.value)}
-                  style={{ ...inputStyle, paddingLeft: '32px' }}
+                  className="fintech-input"
+                  style={{ paddingLeft: '34px', fontVariantNumeric: 'tabular-nums' }}
                 />
               </div>
             </div>
 
             <div>
-              <label style={labelStyle}>Disbursement Deadline</label>
+              <label htmlFor="caseDisbursementDeadline" style={labelStyle}>Disbursement Deadline</label>
               <div style={{ position: 'relative' }}>
                 <Calendar
                   size={16}
-                  color="#64748b"
-                  style={{ position: 'absolute', left: '10px', top: '10px' }}
+                  color="var(--text-muted)"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '12px', top: '12px' }}
                 />
                 <input
+                  id="caseDisbursementDeadline"
                   type="datetime-local"
                   required
                   value={disbursementDeadline}
                   onChange={(e) => setDisbursementDeadline(e.target.value)}
-                  style={{ ...inputStyle, paddingLeft: '32px' }}
+                  className="fintech-input"
+                  style={{ paddingLeft: '34px' }}
                 />
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
             <div>
-              <label style={labelStyle}>Fallback Payment Rail</label>
+              <label htmlFor="caseFallbackPaymentMethod" style={labelStyle}>Fallback Payment Rail</label>
               <select
+                id="caseFallbackPaymentMethod"
                 value={fallbackPaymentMethod}
                 onChange={(e) => setFallbackPaymentMethod(e.target.value as FallbackPaymentMethod)}
-                style={inputStyle}
+                className="fintech-select"
               >
                 <option value="physical_check">Mailed Physical Check</option>
                 <option value="direct_deposit">Direct Deposit (ACH)</option>
@@ -239,11 +306,12 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({
             </div>
 
             <div>
-              <label style={labelStyle}>Default Portal Language</label>
+              <label htmlFor="caseDefaultLanguage" style={labelStyle}>Default Portal Language</label>
               <select
+                id="caseDefaultLanguage"
                 value={defaultLanguage}
                 onChange={(e) => setDefaultLanguage(e.target.value)}
-                style={inputStyle}
+                className="fintech-select"
               >
                 <option value="en">English (en)</option>
                 <option value="es">Spanish (es)</option>
@@ -257,35 +325,17 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                backgroundColor: '#ffffff',
-                color: '#475569',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 20px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: '#1e3a8a',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: 600
-              }}
+              className="btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             >
-              <ShieldCheck size={16} />
+              <ShieldCheck size={16} aria-hidden="true" />
               {isSubmitting ? 'Creating Case...' : 'Register Case'}
             </button>
           </div>
@@ -299,16 +349,6 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
   fontSize: '13px',
   fontWeight: 600,
-  color: '#334155',
-  marginBottom: '4px'
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px 12px',
-  borderRadius: '6px',
-  border: '1px solid #cbd5e1',
-  fontSize: '14px',
-  color: '#0f172a',
-  backgroundColor: '#ffffff'
+  color: 'var(--text-secondary)',
+  marginBottom: '6px'
 };

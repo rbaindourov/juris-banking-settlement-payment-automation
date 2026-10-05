@@ -112,6 +112,7 @@ export const CaseAnalyticsDashboard: React.FC<CaseAnalyticsDashboardProps> = ({
             disabled={isRefreshing || isLoading}
             title="Refresh analytics data"
             className="p-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-sm transition-colors disabled:opacity-50"
+            style={{ minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             aria-label="Refresh analytics"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />

@@ -12,11 +12,11 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
 
   return (
     <div
-      className="fintech-card"
+      className="fintech-card break-words"
       role="region"
       aria-label="Claimant Identity and Award Information"
       style={{
-        padding: '24px 28px',
+        padding: 'clamp(16px, 3.5vw, 28px)',
         marginBottom: '28px',
         background: 'linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)'
       }}
@@ -24,13 +24,13 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
           gap: '20px',
           alignItems: 'center'
         }}
       >
         {/* 1. Verified Claimant Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
           <div
             style={{
               width: '46px',
@@ -47,11 +47,11 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
           >
             <UserCheck size={24} aria-hidden="true" />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {t('claimantName')}
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', marginTop: '1px' }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em', marginTop: '1px', wordBreak: 'break-word' }}>
               {claim.firstName} {claim.lastName}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--color-success-text)', fontWeight: 600 }}>
@@ -92,7 +92,8 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
                 borderRadius: 'var(--radius-sm)',
                 display: 'inline-block',
                 marginTop: '2px',
-                border: '1px solid var(--border-subtle)'
+                border: '1px solid var(--border-subtle)',
+                wordBreak: 'break-all'
               }}
             >
               {claim.claimId}
@@ -119,7 +120,7 @@ export const ClaimantSummaryCard: React.FC<ClaimantSummaryCardProps> = ({ claim,
             <Award size={24} aria-hidden="true" />
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-success-text)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {t('awardAmount')}
             </div>
             <div

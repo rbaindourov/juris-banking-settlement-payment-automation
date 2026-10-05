@@ -167,7 +167,7 @@ export const InteractiveExceptionLedger: React.FC<InteractiveExceptionLedgerProp
             {isLoading ? (
               [...Array(4)].map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td colSpan={7} className="p-4 text-center text-slate-400">
+                  <td colSpan={7} className="p-4 text-center text-slate-500">
                     Loading exceptions ledger...
                   </td>
                 </tr>
@@ -178,7 +178,7 @@ export const InteractiveExceptionLedger: React.FC<InteractiveExceptionLedgerProp
                   <div className="flex flex-col items-center justify-center">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-2" aria-hidden="true" />
                     <p className="font-bold text-slate-700">No exceptions found</p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {exceptions.length === 0
                         ? 'All disbursements and notices for this case are in good standing.'
                         : 'No exceptions match the current search filters.'}
@@ -213,7 +213,7 @@ export const InteractiveExceptionLedger: React.FC<InteractiveExceptionLedgerProp
                         )}
                         <span>{ex.exceptionType.replace(/_/g, ' ')}</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                      <span className="text-[10px] text-slate-500 uppercase font-semibold">
                         Rail: {ex.paymentRail || 'N/A'}
                       </span>
                     </td>

@@ -95,12 +95,12 @@ export function isValidBitcoinAddress(address: string): boolean {
   if (/^3[a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(trimmed)) {
     return true;
   }
-  // Native SegWit Bech32 (starts with bc1q)
-  if (/^bc1q[02-9ac-hj-np-z]{38,58}$/i.test(trimmed)) {
+  // Native SegWit Bech32 (starts with bc1q - lowercase or uppercase, but not mixed case per BIP173)
+  if (/^bc1q[02-9ac-hj-np-z]{38,58}$/i.test(trimmed) && (trimmed === trimmed.toLowerCase() || trimmed === trimmed.toUpperCase())) {
     return true;
   }
-  // Taproot Bech32m (starts with bc1p)
-  if (/^bc1p[02-9ac-hj-np-z]{58}$/i.test(trimmed)) {
+  // Taproot Bech32m (starts with bc1p - lowercase or uppercase, but not mixed case per BIP350)
+  if (/^bc1p[02-9ac-hj-np-z]{58}$/i.test(trimmed) && (trimmed === trimmed.toLowerCase() || trimmed === trimmed.toUpperCase())) {
     return true;
   }
 
