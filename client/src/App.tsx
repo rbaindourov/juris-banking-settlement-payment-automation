@@ -25,6 +25,13 @@ const AdminCaseAnalyticsRoute: React.FC = () => {
   return <CaseDetail caseId={caseId} onBack={() => navigate('/cases')} initialTab="analytics" />;
 };
 
+const AdminCaseCadenceRoute: React.FC = () => {
+  const { caseId } = useParams<{ caseId: string }>();
+  const navigate = useNavigate();
+  if (!caseId) return <Navigate to="/cases" replace />;
+  return <CaseDetail caseId={caseId} onBack={() => navigate('/cases')} initialTab="cadence" />;
+};
+
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -63,6 +70,14 @@ export const App: React.FC = () => {
           element={
             <AdminLayout>
               <AdminCaseAnalyticsRoute />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/cases/:caseId/cadence"
+          element={
+            <AdminLayout>
+              <AdminCaseCadenceRoute />
             </AdminLayout>
           }
         />

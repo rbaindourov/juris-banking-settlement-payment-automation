@@ -10,6 +10,15 @@ import {
   ExceptionItem,
   ResolveExceptionPayload
 } from '../types';
+import {
+  INotificationCadence,
+  IEmailWave,
+  ScheduleProjection,
+  SubBatchSummary,
+  ICadenceStage,
+  ICadenceThrottling,
+  ICadenceSuppressionRules
+} from '../types/cadence';
 
 const API_BASE = '/api';
 
@@ -191,4 +200,141 @@ export const analyticsApi = {
     document.body.removeChild(a);
   }
 };
+
+export const cadenceApi = {
+  // GET /api/cases/:caseId/cadence
+  async getCadence(caseId: string): Promise<{ success: boolean; data: INotificationCadence }> {
+    return fetchApi<{ success: boolean; data: INotificationCadence }>(`/cases/${caseId}/cadence`);
+  },
+
+  // PUT /api/cases/:caseId/cadence
+  async saveCadence(
+    caseId: string,
+    data: {
+      name?: string;
+      status?: string;
+      stages?: ICadenceStage[];
+      throttling?: Partial<ICadenceThrottling>;
+      suppression?: Partial<ICadenceSuppressionRules>;
+    }
+  ): Promise<{ success: boolean; data: INotificationCadence; message?: string }> {
+    return fetchApi<{ success: boolean; data: INotificationCadence; message?: string }>(
+      `/cases/${caseId}/cadence`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }
+    );
+  },
+
+  // PUT /api/cases/:caseId/cadence (alias for saveCadence)
+  async updateCadence(
+    caseId: string,
+    data: {
+      name?: string;
+      status?: string;
+      stages?: ICadenceStage[];
+      throttling?: Partial<ICadenceThrottling>;
+      suppression?: Partial<ICadenceSuppressionRules>;
+    }
+  ): Promise<{ success: boolean; data: INotificationCadence; message?: string }> {
+    return this.saveCadence(caseId, data);
+  },
+
+  // POST /api/cases/:caseId/cadence/preview-schedule
+  async previewSchedule(
+    caseId: string,
+    config: {
+      throttling?: Partial<ICadenceThrottling>;
+      stages?: Partial<ICadenceStage>[];
+    } = {}
+  ): Promise<{ success: boolean; data: ScheduleProjection }> {
+    return fetchApi<{ success: boolean; data: ScheduleProjection }>(
+      `/cases/${caseId}/cadence/preview-schedule`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      }
+    );
+  },
+
+  // GET /api/cases/:caseId/waves
+  async getWaves(caseId: string): Promise<{ success: boolean; data: IEmailWave[] }> {
+    return fetchApi<{ success: boolean; data: IEmailWave[] }>(`/cases/${caseId}/waves`);
+  },
+
+  // GET /api/waves/:waveId
+  async getWave(waveId: string): Promise<{ success: boolean; data: IEmailWave & { subBatches?: SubBatchSummary[] } }> {
+    return fetchApi<{ success: boolean; data: IEmailWave & { subBatches?: SubBatchSummary[] } }>(`/waves/${waveId}`);
+  },
+
+  // GET /api/waves/:waveId (alias for getWave)
+  async getWaveById(waveId: string): Promise<{ success: boolean; data: IEmailWave & { subBatches?: SubBatchSummary[] } }> {
+    return this.getWave(waveId);
+  },
+
+  // POST /api/waves/:waveId/pause
+  async pauseWave(waveId: string, reason?: string): Promise<{ success: boolean; data: IEmailWave; message?: string }> {
+    return fetchApi<{ success: boolean; data: IEmailWave; message?: string }>(
+      `/waves/${waveId}/pause`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      }
+    );
+  },
+
+  // POST /api/waves/:waveId/resume
+  async resumeWave(
+    waveId: string,
+    options?: { rescheduleRemaining?: boolean; newIntervalMinutes?: number }
+  ): Promise<{ success: boolean; data: IEmailWave; message?: string }> {
+    return fetchApi<{ success: boolean; data: IEmailWave; message?: string }>(
+      `/waves/${waveId}/resume`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options || {})
+      }
+    );
+  },
+
+  // POST /api/waves/:waveId/reschedule
+  async rescheduleWave(
+    waveId: string,
+    scheduledDate: string | Date,
+    reason?: string
+  ): Promise<{ success: boolean; data: IEmailWave; message?: string }> {
+    return fetchApi<{ success: boolean; data: IEmailWave; message?: string }>(
+      `/waves/${waveId}/reschedule`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          newScheduledDate: typeof scheduledDate === 'string' ? scheduledDate : scheduledDate.toISOString(),
+          reason
+        })
+      }
+    );
+  },
+
+  // POST /api/waves/:waveId/cancel
+  async cancelWave(
+    waveId: string,
+    reason: string
+  ): Promise<{ success: boolean; data: IEmailWave; message?: string }> {
+    return fetchApi<{ success: boolean; data: IEmailWave; message?: string }>(
+      `/waves/${waveId}/cancel`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      }
+    );
+  }
+};
+
 

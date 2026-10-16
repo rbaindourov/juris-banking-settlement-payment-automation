@@ -8,25 +8,28 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
-  BarChart3
+  BarChart3,
+  CalendarClock
 } from 'lucide-react';
 import { Case, Claimant } from '../types';
-import { caseApi } from '../services/api';
+import { caseApi, cadenceApi } from '../services/api';
 import { ClaimantIngestion } from './ClaimantIngestion';
 import { QuillTemplateEditor } from '../components/QuillTemplateEditor';
 import { CaseAnalyticsDashboard } from '../components/analytics';
+import { CadenceCampaignManager } from '../components/cadence';
 
 interface CaseDetailProps {
   caseId: string;
   onBack: () => void;
-  initialTab?: 'analytics' | 'ingestion' | 'claimants' | 'templates' | 'settings';
+  initialTab?: 'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
 }
 
 export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialTab }) => {
   const [settlementCase, setSettlementCase] = useState<Case | null>(null);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'ingestion' | 'claimants' | 'templates' | 'settings'>(
+  const [activeTab, setActiveTab] = useState<'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings'>(
     initialTab || 'analytics'
   );
+  const [activeWaveCount, setActiveWaveCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -61,6 +64,19 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
       setErrorMsg(err.message || 'Failed to load case');
     } finally {
       setLoading(false);
+    }
+    checkActiveWaves(caseId);
+  };
+
+  const checkActiveWaves = async (cId: string) => {
+    try {
+      const res = await cadenceApi.getWaves(cId);
+      const active = (res.data || []).filter(
+        (w) => w.status === 'in_progress' || w.status === 'scheduled'
+      );
+      setActiveWaveCount(active.length);
+    } catch {
+      // Non-blocking wave count check
     }
   };
 
@@ -140,8 +156,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
     );
   }
 
-  type CaseTabId = 'analytics' | 'ingestion' | 'claimants' | 'templates' | 'settings';
-  const TAB_ORDER: CaseTabId[] = ['analytics', 'ingestion', 'claimants', 'templates', 'settings'];
+  type CaseTabId = 'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
+  const TAB_ORDER: CaseTabId[] = ['analytics', 'cadence', 'ingestion', 'claimants', 'templates', 'settings'];
 
   const handleTabKeyDown = (e: React.KeyboardEvent, currentTab: CaseTabId) => {
     const currentIndex = TAB_ORDER.indexOf(currentTab);
@@ -284,6 +300,30 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
         <button
           type="button"
           role="tab"
+          id="tab-cadence"
+          aria-selected={activeTab === 'cadence'}
+          aria-controls="panel-cadence"
+          tabIndex={activeTab === 'cadence' ? 0 : -1}
+          onClick={() => setActiveTab('cadence')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'cadence')}
+          className={`fintech-tab-item ${activeTab === 'cadence' ? 'active' : ''}`}
+        >
+          <CalendarClock size={16} aria-hidden={true} />
+          <span>Rolling Waves & Cadence</span>
+          {activeWaveCount > 0 && (
+            <span
+              className="status-pill status-pill-active animate-pulse"
+              style={{ fontSize: '10px', padding: '1px 6px', lineHeight: '14px' }}
+              aria-label={`${activeWaveCount} active notification waves`}
+            >
+              LIVE
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          role="tab"
           id="tab-ingestion"
           aria-selected={activeTab === 'ingestion'}
           aria-controls="panel-ingestion"
@@ -402,6 +442,17 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
       {activeTab === 'analytics' && (
         <div role="tabpanel" id="panel-analytics" aria-labelledby="tab-analytics">
           <CaseAnalyticsDashboard
+            caseId={caseId}
+            settlementCase={settlementCase}
+            onRefreshCase={fetchCase}
+          />
+        </div>
+      )}
+
+      {/* Tab 1: Rolling Waves & Cadence Campaign Manager */}
+      {activeTab === 'cadence' && (
+        <div role="tabpanel" id="panel-cadence" aria-labelledby="tab-cadence">
+          <CadenceCampaignManager
             caseId={caseId}
             settlementCase={settlementCase}
             onRefreshCase={fetchCase}

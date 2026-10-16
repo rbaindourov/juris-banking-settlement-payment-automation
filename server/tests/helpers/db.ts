@@ -9,6 +9,10 @@ import { Case } from '../../src/models/Case';
 import { Claimant } from '../../src/models/Claimant';
 import { DisbursementBatch } from '../../src/models/DisbursementBatch';
 import { ReconciliationException } from '../../src/models/ReconciliationException';
+import { NotificationCadence } from '../../src/models/NotificationCadence';
+import { EmailWave } from '../../src/models/EmailWave';
+import { SubBatch } from '../../src/models/SubBatch';
+import { SuppressionList } from '../../src/models/SuppressionList';
 
 // Save the original base test URI before any per-suite mutation
 const BASE_TEST_URI = process.env.ORIGINAL_MONGODB_URI_TEST || (config.MONGODB_URI_TEST || 'mongodb://localhost:27017/juris_banking_test').replace(/_test.*$/, '_test');
@@ -48,7 +52,11 @@ export async function setupTestDb(suiteName?: string): Promise<void> {
     Case.init(),
     Claimant.init(),
     DisbursementBatch.init(),
-    ReconciliationException.init()
+    ReconciliationException.init(),
+    NotificationCadence.init(),
+    EmailWave.init(),
+    SubBatch.init(),
+    SuppressionList.init()
   ]);
 }
 

@@ -6,6 +6,9 @@ import { defineGenerateAndUploadBatch, executeGenerateAndUploadBatch } from './d
 import { definePollReconciliationReports, executePollReconciliationReports } from './definitions/pollReconciliationReports.job';
 import { defineScanGmailBounces, executeScanGmailBounces } from './definitions/scanGmailBounces.job';
 
+import { defineCadenceEvaluateStages, executeEvaluateCadenceStages } from './cadenceEvaluateStages.job';
+import { defineWaveDispatchSubbatch, executeDispatchWaveSubBatch } from './waveDispatchSubbatch.job';
+
 export * from './definitions/dispatchNotifications.job';
 export * from './definitions/sendDeadlineReminders.job';
 export * from './definitions/enforceDeadlineFallback.job';
@@ -13,8 +16,11 @@ export * from './definitions/generateAndUploadBatch.job';
 export * from './definitions/pollReconciliationReports.job';
 export * from './definitions/scanGmailBounces.job';
 
+export * from './cadenceEvaluateStages.job';
+export * from './waveDispatchSubbatch.job';
+
 /**
- * Registers all 6 scheduled Agenda background jobs on the provided Agenda instance.
+ * Registers all scheduled Agenda background jobs on the provided Agenda instance.
  */
 export function registerAllJobs(agenda: Agenda): void {
   defineDispatchNotifications(agenda);
@@ -23,6 +29,10 @@ export function registerAllJobs(agenda: Agenda): void {
   defineGenerateAndUploadBatch(agenda);
   definePollReconciliationReports(agenda);
   defineScanGmailBounces(agenda);
+
+  // Milestone 2 Cadence & Rolling Wave Dispatch Jobs
+  defineCadenceEvaluateStages(agenda);
+  defineWaveDispatchSubbatch(agenda);
 }
 
 /**
@@ -47,4 +57,7 @@ export async function scheduleDefaultRecurringJobs(agenda: Agenda): Promise<void
 
   // 6. Gmail bounce scanner (every 30 minutes)
   await agenda.every('30 minutes', 'email:scan-gmail-bounces');
+
+  // 7. Cadence Stage Evaluation (every 15 minutes)
+  await agenda.every('15 minutes', 'cadence:evaluate-stages');
 }

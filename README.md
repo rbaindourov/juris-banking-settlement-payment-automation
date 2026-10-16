@@ -1,9 +1,9 @@
 # JurisBanking: Settlement Payment Automation
 
 [![License: Commercial Source-Available](https://img.shields.io/badge/License-Commercial%20Source--Available-red.svg)](LICENSE)
-[![Backend Tests: 545/545](https://img.shields.io/badge/Tests-545%2F545%20Passed-brightgreen.svg)]()
-[![E2E Suite: 84/84](https://img.shields.io/badge/E2E-84%2F84%20Passed-brightgreen.svg)]()
-[![UX Training Videos: 4 HD Flows](https://img.shields.io/badge/UX%20Training%20Videos-4%20HD%20Walkthroughs-purple.svg)](docs/TRAINING_VIDEOS.md)
+[![Backend Tests: 812/812](https://img.shields.io/badge/Tests-812%2F812%20Passed-brightgreen.svg)]()
+[![E2E Suite: 87/87](https://img.shields.io/badge/E2E-87%2F87%20Passed-brightgreen.svg)]()
+[![UX Training Videos: 6 HD Flows](https://img.shields.io/badge/UX%20Training%20Videos-6%20HD%20Walkthroughs-purple.svg)](docs/TRAINING_VIDEOS.md)
 [![Node.js: 20+](https://img.shields.io/badge/Node.js-20%2B-green.svg)]()
 [![MongoDB: 7.0](https://img.shields.io/badge/MongoDB-7.0%20Native-emerald.svg)]()
 [![TypeScript: Strict](https://img.shields.io/badge/TypeScript-Strict%20Mode-blue.svg)]()
@@ -40,7 +40,7 @@ flowchart TD
 
 ## 📽️ UX Training Videos & Walkthroughs
 
-The repository includes high-definition training video walkthroughs and full user documentation located in [`docs/TRAINING_VIDEOS.md`](docs/TRAINING_VIDEOS.md):
+The repository includes high-definition training video walkthroughs and full user documentation located in [`docs/TRAINING_VIDEOS.md`](docs/TRAINING_VIDEOS.md) and [`docs/settlement_notification_cadence_guide.md`](docs/settlement_notification_cadence_guide.md):
 
 | Flow | Video Title | Walkthrough Scope | Duration |
 | :---: | :--- | :--- | :---: |
@@ -48,6 +48,8 @@ The repository includes high-definition training video walkthroughs and full use
 | **02** | **[Quill WYSIWYG & Localization](docs/videos/02_quill_wysiwyg_and_localization.mp4)** | Legal notices, merge tags, and multi-lingual switching (EN, ES, ZH, VI) | `00:10` |
 | **03** | **[Claimant Portal & 9 Payment Rails](docs/videos/03_claimant_portal_and_payment_rails.mp4)** | Secure 64-hex token, ABA validation, 9 payment rails, electronic signature | `00:39` |
 | **04** | **[Analytics & Agendash](docs/videos/04_analytics_dashboard_and_agendash.mp4)** | Real-time delivery funnel, payout charts, NACHA exceptions & Agenda jobs | `00:21` |
+| **05** | **[Rolling Cadence & Throttling Designer](docs/videos/05_rolling_cadence_and_throttling_designer.mp4)** | 5-stage deadline-relative cadence timeline, EN/ES/ZH/VI stage templates, sub-batch throttling & 3-layer eligibility preview | `00:16` |
+| **06** | **[Live Wave Telemetry & Wave Controls](docs/videos/06_live_wave_telemetry_and_controls.mp4)** | Real-time wave delivery funnels, sub-batch progress bars, Pause / Resume / Reschedule / Cancel controls & judicial docket modal | `00:31` |
 
 ---
 

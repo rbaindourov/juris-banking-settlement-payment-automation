@@ -9,6 +9,7 @@ import trackingRoutes from './routes/tracking.routes';
 import portalRoutes from './routes/portal.routes';
 import reconciliationRoutes from './routes/reconciliation.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import cadenceRoutes from './routes/cadence.routes';
 import { authenticateToken, requireRole } from './middleware/auth';
 import { CORE_AGENDA_JOBS, AGENDA_JOBS } from './types';
 import { createExpressMiddleware } from 'agendash';
@@ -58,16 +59,17 @@ export function createApp(): Express {
   // Auth routes
   app.use('/api/auth', authRoutes);
 
-  // Case & Ingestion routes
-  app.use('/api/cases', caseRoutes);
-  app.use('/api/cases', reconciliationRoutes);
-  app.use('/api/cases', analyticsRoutes);
-
   // Public tracking routes
   app.use('/api/public/tracking', trackingRoutes);
 
   // Public claimant portal routes
   app.use('/api/public/claim', portalRoutes);
+
+  // Case & Ingestion routes
+  app.use('/api/cases', caseRoutes);
+  app.use('/api/cases', reconciliationRoutes);
+  app.use('/api/cases', analyticsRoutes);
+  app.use('/api', cadenceRoutes);
 
   // Agendash scheduler mount (RBAC protected per PROJECT.md Contract 5)
   app.use(
