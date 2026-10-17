@@ -10,6 +10,7 @@ import portalRoutes from './routes/portal.routes';
 import reconciliationRoutes from './routes/reconciliation.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import cadenceRoutes from './routes/cadence.routes';
+import fraudRoutes from './routes/fraud.routes';
 import { authenticateToken, requireRole } from './middleware/auth';
 import { CORE_AGENDA_JOBS, AGENDA_JOBS } from './types';
 import { createExpressMiddleware } from 'agendash';
@@ -70,6 +71,7 @@ export function createApp(): Express {
   app.use('/api/cases', reconciliationRoutes);
   app.use('/api/cases', analyticsRoutes);
   app.use('/api', cadenceRoutes);
+  app.use('/api', fraudRoutes);
 
   // Agendash scheduler mount (RBAC protected per PROJECT.md Contract 5)
   app.use(

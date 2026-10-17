@@ -48,6 +48,25 @@ export interface Case {
   updatedAt: string;
 }
 
+export type FraudRiskTier = 'low' | 'medium' | 'high' | 'critical';
+
+export type FraudReviewStatus =
+  | 'unscanned'
+  | 'auto_cleared'
+  | 'flagged_for_review'
+  | 'quarantined_blocked'
+  | 'manually_approved'
+  | 'manually_rejected';
+
+export interface FraudSignalItem {
+  code: string;
+  category: string;
+  severity: string;
+  scoreContribution: number;
+  description: string;
+  detectedAt?: string;
+}
+
 export interface Claimant {
   id: string;
   _id?: string;
@@ -70,6 +89,14 @@ export interface Claimant {
   tokenExpiresAt?: string;
   selectedPaymentMethod?: string;
   paymentDetails?: any;
+  fraudScore?: number;
+  fraudRiskTier?: FraudRiskTier;
+  fraudReviewStatus?: FraudReviewStatus;
+  fraudSignals?: FraudSignalItem[];
+  fraudScannedAt?: string;
+  fraudReviewedBy?: string;
+  fraudReviewedAt?: string;
+  fraudReviewNotes?: string;
 }
 
 export interface IngestionError {
@@ -287,3 +314,95 @@ export interface ResolveExceptionPayload {
     zip: string;
   };
 }
+
+// ---------------------------------------------------------------------------
+// JurisShield™ Multi-Tenant Fraud Monitoring & Claimant Scoring Interfaces
+// ---------------------------------------------------------------------------
+
+export interface FraudScanEventItem {
+  id?: string;
+  _id?: string;
+  scanType?: string;
+  claimId?: string;
+  fraudScore: number;
+  riskTier: FraudRiskTier;
+  scanDurationMs?: number;
+  triggeredSignalCodes?: string[];
+  createdAt?: string;
+}
+
+export interface FraudCaseMetrics {
+  caseId: string;
+  totalClaimants?: number;
+  totalScanned: number;
+  unscannedCount?: number;
+  scanCoveragePercent?: number;
+  avgScanLatencyMs?: number;
+  avgLatencyMs?: number;
+  scansPerMinute?: number;
+  settlementDollarsProtected?: number;
+  fundsProtected?: number;
+  quarantinedOrFlaggedCount?: number;
+  flaggedForReviewCount?: number;
+  quarantinedBlockedCount?: number;
+  manuallyApprovedCount?: number;
+  manuallyRejectedCount?: number;
+  autoClearedCount?: number;
+  crossTenantThreatHits?: number;
+  riskTierDistribution: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  reviewStatusBreakdown?: Record<string, number>;
+  topSignals?: Array<{
+    code: string;
+    count: number;
+    category?: string;
+    description?: string;
+  }>;
+  recentScanEvents?: FraudScanEventItem[];
+}
+
+export interface ThreatIndicatorSummaryItem {
+  id?: string;
+  _id?: string;
+  indicatorType: 'payout_hash' | 'device_fingerprint' | 'ip_subnet' | 'email_domain' | string;
+  indicatorValue: string;
+  hitCount: number;
+  distinctCasesCount: number;
+  distinctTenantsCount: number;
+  severity: 'medium' | 'high' | 'critical' | string;
+  blocked?: boolean;
+  lastSeenAt?: string;
+}
+
+export interface MultiTenantNetworkIntelligence {
+  totalIndicators?: number;
+  crossDocketPayoutCollisions?: number;
+  duplicatePayoutEndpointsBlocked?: number;
+  disposableEmailDomainsBlocked?: number;
+  spamDomainsIntercepted?: number;
+  highVelocityIpSubnets?: number;
+  deviceFingerprintCollisions?: number;
+  networkFundsProtected?: number;
+  totalNetworkScans?: number;
+  byType?: {
+    payout_hash?: number;
+    email_domain?: number;
+    ip_subnet?: number;
+    device_fingerprint?: number;
+  };
+  topIndicators?: ThreatIndicatorSummaryItem[];
+  indicators?: ThreatIndicatorSummaryItem[];
+}
+
+export interface FraudClaimantsResponse {
+  claimants: Claimant[];
+  total: number;
+  page: number;
+  limit?: number;
+  totalPages: number;
+}
+

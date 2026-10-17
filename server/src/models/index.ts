@@ -10,3 +10,7 @@ export * from './NotificationCadence';
 export * from './EmailWave';
 export * from './SubBatch';
 export * from './SuppressionList';
+
+// JurisShield™ Multi-Tenant Fraud Monitoring Models & Types
+export * from './FraudScanEvent';
+export * from './MultiTenantThreatIndicator';

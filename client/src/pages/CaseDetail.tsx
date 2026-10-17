@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   AlertCircle,
   BarChart3,
-  CalendarClock
+  CalendarClock,
+  ShieldAlert
 } from 'lucide-react';
 import { Case, Claimant } from '../types';
 import { caseApi, cadenceApi } from '../services/api';
@@ -17,16 +18,17 @@ import { ClaimantIngestion } from './ClaimantIngestion';
 import { QuillTemplateEditor } from '../components/QuillTemplateEditor';
 import { CaseAnalyticsDashboard } from '../components/analytics';
 import { CadenceCampaignManager } from '../components/cadence';
+import { FraudMonitoringDashboard, FraudScoreBadge } from '../components/fraud';
 
 interface CaseDetailProps {
   caseId: string;
   onBack: () => void;
-  initialTab?: 'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
+  initialTab?: 'analytics' | 'fraud' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
 }
 
 export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialTab }) => {
   const [settlementCase, setSettlementCase] = useState<Case | null>(null);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings'>(
+  const [activeTab, setActiveTab] = useState<'analytics' | 'fraud' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings'>(
     initialTab || 'analytics'
   );
   const [activeWaveCount, setActiveWaveCount] = useState<number>(0);
@@ -156,8 +158,8 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
     );
   }
 
-  type CaseTabId = 'analytics' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
-  const TAB_ORDER: CaseTabId[] = ['analytics', 'cadence', 'ingestion', 'claimants', 'templates', 'settings'];
+  type CaseTabId = 'analytics' | 'fraud' | 'cadence' | 'ingestion' | 'claimants' | 'templates' | 'settings';
+  const TAB_ORDER: CaseTabId[] = ['analytics', 'fraud', 'cadence', 'ingestion', 'claimants', 'templates', 'settings'];
 
   const handleTabKeyDown = (e: React.KeyboardEvent, currentTab: CaseTabId) => {
     const currentIndex = TAB_ORDER.indexOf(currentTab);
@@ -295,6 +297,21 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
         >
           <BarChart3 size={16} aria-hidden="true" />
           <span>Analytics & Exceptions</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          id="tab-fraud"
+          aria-selected={activeTab === 'fraud'}
+          aria-controls="panel-fraud"
+          tabIndex={activeTab === 'fraud' ? 0 : -1}
+          onClick={() => setActiveTab('fraud')}
+          onKeyDown={(e) => handleTabKeyDown(e, 'fraud')}
+          className={`fintech-tab-item ${activeTab === 'fraud' ? 'active' : ''}`}
+        >
+          <ShieldAlert size={16} aria-hidden="true" />
+          <span>Fraud Shield &amp; Scoring</span>
         </button>
 
         <button
@@ -449,6 +466,13 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
         </div>
       )}
 
+      {/* Tab: Fraud Shield & Scoring */}
+      {activeTab === 'fraud' && (
+        <div role="tabpanel" id="panel-fraud" aria-labelledby="tab-fraud">
+          <FraudMonitoringDashboard caseId={caseId} />
+        </div>
+      )}
+
       {/* Tab 1: Rolling Waves & Cadence Campaign Manager */}
       {activeTab === 'cadence' && (
         <div role="tabpanel" id="panel-cadence" aria-labelledby="tab-cadence">
@@ -517,6 +541,7 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
                     <th style={{ padding: '10px 16px' }}>Claimant Name</th>
                     <th style={{ padding: '10px 16px' }}>Email</th>
                     <th style={{ padding: '10px 16px' }}>Settlement Amount</th>
+                    <th style={{ padding: '10px 16px' }}>Fraud Score</th>
                     <th style={{ padding: '10px 16px' }}>Status</th>
                     <th style={{ padding: '10px 16px' }}>Selected Rail</th>
                     <th style={{ padding: '10px 16px' }}>Magic Link Token</th>
@@ -529,6 +554,9 @@ export const CaseDetail: React.FC<CaseDetailProps> = ({ caseId, onBack, initialT
                       <td style={{ padding: '10px 16px' }}>{`${cl.firstName} ${cl.lastName}`}</td>
                       <td style={{ padding: '10px 16px', color: 'var(--text-muted)' }}>{cl.email}</td>
                       <td style={{ padding: '10px 16px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>${cl.settlementAmount?.toFixed(2)}</td>
+                      <td style={{ padding: '10px 16px' }}>
+                        <FraudScoreBadge score={cl.fraudScore} riskTier={cl.fraudRiskTier} />
+                      </td>
                       <td style={{ padding: '10px 16px' }}>
                         <span
                           className={`status-pill ${cl.status === 'selected' ? 'status-pill-success' : 'status-pill-neutral'}`}

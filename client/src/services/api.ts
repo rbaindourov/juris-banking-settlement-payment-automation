@@ -8,7 +8,10 @@ import {
   PaymentRailMetricsData,
   ExceptionsResponse,
   ExceptionItem,
-  ResolveExceptionPayload
+  ResolveExceptionPayload,
+  FraudCaseMetrics,
+  MultiTenantNetworkIntelligence,
+  FraudClaimantsResponse
 } from '../types';
 import {
   INotificationCadence,
@@ -337,4 +340,71 @@ export const cadenceApi = {
   }
 };
 
+export const fraudApi = {
+  async getCaseFraudMetrics(caseId: string): Promise<FraudCaseMetrics> {
+    const res = await fetchApi<any>(`/cases/${caseId}/fraud/metrics`);
+    return res?.metrics ? res.metrics : res;
+  },
 
+  async listCaseFraudClaimants(
+    caseId: string,
+    params: {
+      riskTier?: string;
+      reviewStatus?: string;
+      minScore?: number;
+      page?: number;
+      limit?: number;
+    } = {}
+  ): Promise<FraudClaimantsResponse> {
+    const searchParams = new URLSearchParams();
+    if (params.riskTier) searchParams.set('riskTier', params.riskTier);
+    if (params.reviewStatus) {
+      searchParams.set('reviewStatus', params.reviewStatus);
+      searchParams.set('fraudReviewStatus', params.reviewStatus);
+    }
+    if (params.minScore !== undefined) searchParams.set('minScore', String(params.minScore));
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+
+    const query = searchParams.toString();
+    return fetchApi<FraudClaimantsResponse>(
+      `/cases/${caseId}/fraud/claimants${query ? `?${query}` : ''}`
+    );
+  },
+
+  async reviewClaimantFraud(
+    caseId: string,
+    claimantId: string,
+    payload: { action: 'approve' | 'reject'; notes: string }
+  ): Promise<{ success?: boolean; message?: string; claimant: Claimant }> {
+    return fetchApi<{ success?: boolean; message?: string; claimant: Claimant }>(
+      `/cases/${caseId}/fraud/claimants/${claimantId}/review`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }
+    );
+  },
+
+  async rescanCaseFraud(
+    caseId: string
+  ): Promise<{
+    success?: boolean;
+    message?: string;
+    scannedCount?: number;
+    totalScanned?: number;
+    flaggedCount?: number;
+    quarantinedCount?: number;
+  }> {
+    return fetchApi(`/cases/${caseId}/fraud/rescan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+  },
+
+  async getNetworkIntelligence(): Promise<MultiTenantNetworkIntelligence> {
+    const res = await fetchApi<any>('/fraud/network-intelligence');
+    return res?.intelligence ? res.intelligence : res;
+  }
+};

@@ -539,10 +539,11 @@ export class BatchGeneratorService {
 
     const caseLookupIds = [caseDoc._id, (caseDoc as any).caseId, caseIdentifier].filter(Boolean);
 
-    // 2. Query candidate eligible claimants
+    // 2. Query candidate eligible claimants (enforcing JurisShield™ SFTP Quarantine Gate)
     const candidateClaimants = await Claimant.find({
       caseId: { $in: caseLookupIds },
-      status: { $in: ['selected', 'deadline_expired'] }
+      status: { $in: ['selected', 'deadline_expired'] },
+      fraudReviewStatus: { $nin: ['flagged_for_review', 'quarantined_blocked', 'manually_rejected'] }
     }).sort({ createdAt: 1 });
 
     if (!candidateClaimants || candidateClaimants.length === 0) {
@@ -566,7 +567,8 @@ export class BatchGeneratorService {
     await Claimant.updateMany(
       {
         _id: { $in: candidateIds },
-        status: { $in: ['selected', 'deadline_expired'] }
+        status: { $in: ['selected', 'deadline_expired'] },
+        fraudReviewStatus: { $nin: ['flagged_for_review', 'quarantined_blocked', 'manually_rejected'] }
       },
       {
         $set: {

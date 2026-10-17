@@ -59,6 +59,24 @@ export interface PortalApiResponse {
   case: CasePortalData;
 }
 
+export interface PortalTelemetryPayload {
+  dwellTimeMs: number;
+  interactionCount: number;
+  keystrokeCount: number;
+  webdriverDetected: boolean;
+  deviceFingerprint: string;
+  timezoneOffset: number;
+  screenResolution: string;
+}
+
+export interface SecurityVerificationReceipt {
+  scanId?: string;
+  verifiedAt: string;
+  shieldStatus: 'verified' | 'flagged_for_review' | 'quarantined';
+  fraudScore?: number;
+  riskTier?: 'low' | 'medium' | 'high' | 'critical';
+}
+
 export interface ReceiptData {
   confirmationNumber: string;
   claimId: string;
@@ -73,6 +91,7 @@ export interface ReceiptData {
   ipAddress: string;
   maskedDetails: Record<string, any>;
   assignedFallbackMethod?: PaymentRail;
+  securityVerification?: SecurityVerificationReceipt;
 }
 
 export interface SelectPaymentPayload {
@@ -80,6 +99,7 @@ export interface SelectPaymentPayload {
   details: Record<string, any>;
   certificationAffirmed: boolean;
   signature: string;
+  telemetry?: PortalTelemetryPayload;
 }
 
 export interface SelectPaymentResponse {
@@ -87,4 +107,5 @@ export interface SelectPaymentResponse {
   confirmationNumber: string;
   status: string;
   receipt: ReceiptData;
+  securityVerification?: SecurityVerificationReceipt;
 }

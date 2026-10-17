@@ -9,7 +9,7 @@
 [![TypeScript: Strict](https://img.shields.io/badge/TypeScript-Strict%20Mode-blue.svg)]()
 
 
-> **Enterprise-grade, mathematically verified class-action settlement administration and legal payment distribution platform built on the MERN stack (MongoDB, Express, React, Node.js) with native Agenda scheduling, Agendash, Quill WYSIWYG, 9 payment rails, multi-language localization, Dash Solutions SFTP automation, and open-source `gmail-service` integration.**
+> **Enterprise-grade, mathematically verified class-action settlement administration and legal payment distribution platform built on the MERN stack (MongoDB, Express, React, Node.js) with native Agenda scheduling, Agendash, Quill WYSIWYG, 9 payment rails, JurisShield™ Multi-Tenant Fraud Monitoring & Claimant Fraud Scoring (`0–100`), multi-language localization, Dash Solutions SFTP automation, and open-source `gmail-service` integration.**
 
 ---
 
@@ -17,30 +17,32 @@
 
 Class-action and legal settlement administration has historically been dominated by legacy service bureaus charging 10%–25% cuts of settlement pools while operating opaque, antiquated systems. 
 
-**JurisBanking** is an open-source settlement distribution engine engineered for law firms, settlement claims administrators, and court-appointed special masters. It provides **tamper-proof transparency, mathematical payment validation, automated batch disbursement over SFTP, and audit reconciliation**.
+**JurisBanking** is an open-source settlement distribution engine engineered for law firms, settlement claims administrators, and court-appointed special masters. It provides **tamper-proof transparency, mathematical payment validation, real-time JurisShield™ multi-tenant fraud scoring (`0–100`) & SFTP disbursement quarantine gates, automated batch disbursement over SFTP, and audit reconciliation**.
 
 ```mermaid
 flowchart TD
     A["Law Firm Admin / Case Manager"] -->|"1. Register Case & Upload Roster (CSV/XLSX)"| B["Streaming Ingestion Engine"]
-    B -->|"Validate Formats & Fund Variance"| C[("MongoDB 7.0 (Compound Unique Indexes)")]
+    B -->|"Validate Formats, Fund Variance & Ingestion Fraud Pre-Scan"| C[("MongoDB 7.0 (Compound Unique Indexes)")]
     A -->|"2. Compose Legal Notices"| D["Quill WYSIWYG Designer (i18n & Merge Tags)"]
     D -->|"3. Schedule Throttled Dispatch"| E["Agenda Scheduler & gmail-service / SMTP"]
-    E -->|"4. Deliver Signed Magic Links"| F["Claimant Selection Portal (9 Rails)"]
-    F -->|"5. Payment Choice Recorded"| C
+    E -->|"4. Deliver Signed Magic Links"| F["Claimant Selection Portal (9 Rails + JurisShield™ Sensor)"]
+    F -->|"5. Payment Choice + Behavioral Telemetry"| L["JurisShield™ 4-Vector Fraud Scoring Engine (0–100)"]
+    L <-->|"HMAC-SHA256 Cross-Tenant Payout & Device Correlation"| M[("Multi-Tenant Threat Intelligence Registry")]
+    L -->|"Persist Fraud Score, Risk Tier & Review Status"| C
     E -->|"6. Deadline Passed: Apply Fallback"| G["Default Fallback Sweep"]
     G --> C
-    E -->|"7. Batch Outbound Payouts"| H["Dash Solutions SFTP Batch Generator"]
-    H -->|"Upload RFC 4180 CSV + SHA-256"| I[("Dash Solutions SFTP Server")]
+    E -->|"7. Batch Outbound Payouts (SFTP Quarantine Gate)"| H["Dash Solutions SFTP Batch Generator"]
+    H -->|"Upload RFC 4180 CSV + SHA-256 (Cleared Claims Only)"| I[("Dash Solutions SFTP Server")]
     I -->|"8. Inbound Reconciliation Reports"| J["Reconciliation Parser & Exception Ledger"]
     J -->|"Update Claimant Terminal States"| C
-    C -->|"Live Conversion Funnel & Balances"| K["Agendash & Case Analytics Dashboard"]
+    C -->|"Live Conversion Funnel, Fraud Radar & Balances"| K["Agendash, Fraud Shield & Case Analytics Dashboard"]
 ```
 
 ---
 
 ## 📽️ UX Training Videos & Walkthroughs
 
-The repository includes high-definition training video walkthroughs and full user documentation located in [`docs/TRAINING_VIDEOS.md`](docs/TRAINING_VIDEOS.md) and [`docs/settlement_notification_cadence_guide.md`](docs/settlement_notification_cadence_guide.md):
+The repository includes high-definition training video walkthroughs and full user documentation located in [`docs/TRAINING_VIDEOS.md`](docs/TRAINING_VIDEOS.md), [`docs/settlement_notification_cadence_guide.md`](docs/settlement_notification_cadence_guide.md), and [`docs/fraud_monitoring_and_scoring_guide.md`](docs/fraud_monitoring_and_scoring_guide.md):
 
 | Flow | Video Title | Walkthrough Scope | Duration |
 | :---: | :--- | :--- | :---: |
@@ -107,6 +109,13 @@ The repository includes high-definition training video walkthroughs and full use
 - Real-time case delivery funnels: Uploaded $\to$ Dispatched $\to$ Delivered $\to$ Visited $\to$ Selected $\to$ Disbursed.
 - Interactive Recharts visualization of payment rail distribution and fund balances.
 - Streaming audit log export with formula injection defense (CWE-1236, neutralizing `=+-@\t\r` formula triggers).
+
+### 9. JurisShield™ Multi-Tenant Fraud Monitoring & Claimant Fraud Scoring (`0–100`)
+- **4-Vector Quantitative Fraud Scoring (`0–100`)**: Evaluates every claimant at roster ingestion and live portal submission across **Multi-Tenant Payout Endpoint Collision (`0–35 pts`)**, **Device Fingerprint & IP Subnet Velocity (`0–25 pts`)**, **Behavioral & Bot Automation Telemetry (`0–20 pts`)**, and **Email Domain, Spam & Identity Integrity (`0–20 pts`)**, assigning deterministic risk tiers (`low`, `medium`, `high`, `critical`).
+- **Privacy-Preserving Cross-Tenant Threat Intelligence**: Uses salted HMAC-SHA256 digests (`payoutEndpointHash` and `deviceFingerprintHash`) to detect duplicate ACH, Debit Card, PayPal, Venmo, Zelle, Physical Check, and Bitcoin payout destinations across distinct law firms and court dockets without exposing cross-tenant PII.
+- **Active Portal Behavioral Sensor (`/claim/:token`)**: Passive client-side telemetry (`useFraudTelemetrySensor` + `JurisShieldBadge`) measures session dwell time, signature keystroke cadence, pointer entropy, and headless WebDriver flags while embedding a cryptographic verification seal on the claimant receipt.
+- **Automated SFTP Disbursement Quarantine Gate & Admin Review Console**: Automatically holds `flagged_for_review` and `quarantined_blocked` claims out of outbound Dash Solutions SFTP batches until a Case Manager or Law Firm Admin adjudicates them in the `FraudMonitoringDashboard` and `ClaimantFraudReviewDrawer`.
+- Full architecture and API reference: [`docs/fraud_monitoring_and_scoring_guide.md`](docs/fraud_monitoring_and_scoring_guide.md).
 
 ---
 

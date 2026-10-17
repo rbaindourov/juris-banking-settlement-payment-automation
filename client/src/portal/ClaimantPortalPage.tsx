@@ -6,7 +6,9 @@ import { LockoutNotice } from './components/LockoutNotice';
 import { PaymentRailSelector } from './components/PaymentRailSelector';
 import { DigitalSignatureCard } from './components/DigitalSignatureCard';
 import { PrintableReceipt } from './components/PrintableReceipt';
+import { JurisShieldBadge } from './components/JurisShieldBadge';
 import { usePortalI18n } from './hooks/usePortalI18n';
+import { useFraudTelemetrySensor } from './hooks/useFraudTelemetrySensor';
 import { portalApi } from './services/portalApi';
 import {
   ClaimPortalData,
@@ -27,6 +29,7 @@ export const ClaimantPortalPage: React.FC = () => {
   const [caseData, setCaseData] = useState<CasePortalData | null>(null);
 
   const { currentLang, setLang, t } = usePortalI18n('en');
+  const { recordKeystroke, recordInteraction, getTelemetrySnapshot } = useFraudTelemetrySensor();
 
   // Form State
   const [selectedRail, setSelectedRail] = useState<PaymentRail>('ach');
@@ -72,10 +75,12 @@ export const ClaimantPortalPage: React.FC = () => {
   }, [fetchClaimData, currentLang]);
 
   const handleLanguageChange = (newLang: LanguageCode) => {
+    recordInteraction();
     setLang(newLang);
   };
 
   const handleDetailsChange = (newDetails: Record<string, any>, isValid: boolean) => {
+    recordInteraction();
     setDetails(newDetails);
     setIsDetailsValid(isValid);
   };
@@ -89,15 +94,20 @@ export const ClaimantPortalPage: React.FC = () => {
     setSubmitError(null);
 
     try {
+      const telemetry = getTelemetrySnapshot();
       const res = await portalApi.selectPayment(token, {
         method: selectedRail,
         details,
         certificationAffirmed,
-        signature: signature.trim()
+        signature: signature.trim(),
+        telemetry
       });
 
       if (res.success && res.receipt) {
-        setReceipt(res.receipt);
+        setReceipt({
+          ...res.receipt,
+          securityVerification: res.receipt.securityVerification || res.securityVerification
+        });
       } else {
         // Refresh claim data
         await fetchClaimData(currentLang);
@@ -250,6 +260,9 @@ export const ClaimantPortalPage: React.FC = () => {
         {/* Claimant Summary */}
         <ClaimantSummaryCard claim={claim} t={t} />
 
+        {/* JurisShield Multi-Tenant Fraud & Identity Verification Banner */}
+        <JurisShieldBadge />
+
         {/* Lockout Notice if Expired */}
         {isLocked && (
           <LockoutNotice
@@ -306,7 +319,10 @@ export const ClaimantPortalPage: React.FC = () => {
 
             <PaymentRailSelector
               selectedRail={selectedRail}
-              onSelectRail={setSelectedRail}
+              onSelectRail={(rail) => {
+                recordInteraction();
+                setSelectedRail(rail);
+              }}
               details={details}
               onChangeDetails={handleDetailsChange}
               disabled={isLocked || isSubmitting}
@@ -316,9 +332,15 @@ export const ClaimantPortalPage: React.FC = () => {
 
             <DigitalSignatureCard
               certificationAffirmed={certificationAffirmed}
-              onToggleCertification={setCertificationAffirmed}
+              onToggleCertification={(val) => {
+                recordInteraction();
+                setCertificationAffirmed(val);
+              }}
               signature={signature}
-              onChangeSignature={setSignature}
+              onChangeSignature={(sig) => {
+                recordKeystroke();
+                setSignature(sig);
+              }}
               onSubmit={handleSubmitElection}
               isSubmitting={isSubmitting}
               canSubmit={canSubmit}

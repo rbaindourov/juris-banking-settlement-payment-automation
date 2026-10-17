@@ -17,6 +17,15 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
     window.print();
   };
 
+  const shieldStatus = receipt.securityVerification?.shieldStatus || 'verified';
+  const shieldVerifiedAt = receipt.securityVerification?.verifiedAt || receipt.timestamp;
+  const shieldStatusLabel =
+    shieldStatus === 'verified'
+      ? 'VERIFIED — AUTO-CLEARED FOR DISBURSEMENT'
+      : shieldStatus === 'flagged_for_review'
+      ? 'VERIFIED — COMPLIANCE REVIEW QUEUED'
+      : 'RECEIVED — SECURITY AUDIT HOLD';
+
   const handleDownload = () => {
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -44,6 +53,7 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
   <div class="row"><span class="label">Payment Method</span><span class="value">${receipt.selectedMethod.toUpperCase()}</span></div>
   <div class="row"><span class="label">Submission Timestamp</span><span class="value">${receipt.timestamp}</span></div>
   <div class="row"><span class="label">Digital Signature</span><span class="value">${receipt.digitalSignature}</span></div>
+  <div class="row"><span class="label">JurisShield™ Verification</span><span class="value">${shieldStatusLabel} (${new Date(shieldVerifiedAt).toLocaleString('en-US')})</span></div>
   <div class="audit">
     Forensic Audit Record: Captured IP ${receipt.ipAddress} under penalty of perjury under 28 U.S.C. § 1746. Verified and recorded by Juris Banking Settlement Platform.
   </div>
@@ -171,6 +181,38 @@ export const PrintableReceipt: React.FC<PrintableReceiptProps> = ({
           <div style={{ fontSize: '15px', fontWeight: 600, fontStyle: 'italic', fontFamily: 'Georgia, serif', color: 'var(--text-primary)', marginTop: '2px' }}>
             {receipt.digitalSignature}
           </div>
+        </div>
+      </div>
+
+      {/* JurisShield Security Verification Row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          backgroundColor: '#f0fdf4',
+          border: '1px solid #bbf7d0',
+          padding: '12px 16px',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: '16px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <ShieldCheck size={18} color="#15803d" aria-hidden="true" />
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#14532d', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              JurisShield™ Multi-Tenant Security Verification
+            </div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#166534' }}>
+              Status: {shieldStatusLabel}
+            </div>
+          </div>
+        </div>
+        <div style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#15803d', fontWeight: 600 }}>
+          Scanned: {new Date(shieldVerifiedAt).toLocaleString('en-US')}
+          {receipt.securityVerification?.scanId ? ` • ID: ${receipt.securityVerification.scanId.slice(0, 10)}` : ''}
         </div>
       </div>
 

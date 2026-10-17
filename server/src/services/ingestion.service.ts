@@ -4,6 +4,7 @@ import { parse as parseCsvSync } from 'csv-parse/sync';
 import * as xlsx from 'xlsx';
 import { Case, ICase } from '../models/Case';
 import { Claimant, IClaimant, PaymentRail, PAYMENT_RAILS } from '../models/Claimant';
+import { FraudScoringService } from './fraudScoring.service';
 
 export function normalizePaymentMethod(methodStr: string): PaymentRail | undefined {
   if (!methodStr || typeof methodStr !== 'string') return undefined;
@@ -638,12 +639,36 @@ export class IngestionService {
 
     const docsToInsert = claimants.map(c => {
       const token = this.generateToken();
+      const emailLower = c.email.toLowerCase();
+      const payoutEndpointHash = c.selectedPaymentMethod
+        ? FraudScoringService.computePayoutEndpointHash(c.selectedPaymentMethod, c.paymentDetails, {
+            email: emailLower,
+            phone: c.phone,
+            address: c.address
+          })
+        : undefined;
+
+      const isDisposable = FraudScoringService.isDisposableEmailDomain(emailLower);
+      const initialScore = isDisposable ? 18 : 0;
+      const initialSignals = isDisposable
+        ? [
+            {
+              code: 'DISPOSABLE_EMAIL_DOMAIN',
+              category: 'identity_domain' as const,
+              severity: 'high' as const,
+              scoreContribution: 18,
+              description: `Claimant email uses known disposable/burner provider domain (${FraudScoringService.extractEmailDomain(emailLower)}).`,
+              detectedAt: new Date()
+            }
+          ]
+        : [];
+
       return {
         caseId: targetCaseId,
         claimId: c.claimId,
         firstName: c.firstName,
         lastName: c.lastName,
-        email: c.email.toLowerCase(),
+        email: emailLower,
         phone: c.phone || '',
         address: c.address || { street: '', city: '', state: '', zip: '' },
         settlementAmount: c.settlementAmount,
@@ -651,12 +676,30 @@ export class IngestionService {
         paymentSelectionToken: token,
         tokenExpiresAt,
         selectedPaymentMethod: c.selectedPaymentMethod || undefined,
-        paymentDetails: c.paymentDetails || undefined
+        paymentDetails: c.paymentDetails || undefined,
+        payoutEndpointHash,
+        fraudScore: initialScore,
+        fraudRiskTier: 'low' as const,
+        fraudReviewStatus: 'auto_cleared' as const,
+        fraudSignals: initialSignals,
+        fraudScannedAt: new Date()
       };
     });
 
     if (docsToInsert.length > 0) {
-      await Claimant.insertMany(docsToInsert, { ordered: false });
+      const inserted = await Claimant.insertMany(docsToInsert, { ordered: false });
+
+      if (inserted && inserted.length > 0 && inserted.length <= 100 && mongoose.connection.readyState === 1) {
+        try {
+          for (const doc of inserted) {
+            if (doc.selectedPaymentMethod || FraudScoringService.isDisposableEmailDomain(doc.email)) {
+              await FraudScoringService.prescanClaimantOnIngestion(doc as unknown as IClaimant, caseDoc);
+            }
+          }
+        } catch {
+          // Non-fatal pre-scan warning
+        }
+      }
 
       // If case was in draft, transition to active
       if (caseDoc.status === 'draft') {

@@ -57,6 +57,63 @@ export interface IClaimantAddress {
   zip?: string;
 }
 
+export type FraudRiskTier = 'low' | 'medium' | 'high' | 'critical';
+
+export const FRAUD_RISK_TIERS: readonly FraudRiskTier[] = [
+  'low',
+  'medium',
+  'high',
+  'critical'
+] as const;
+
+export type FraudReviewStatus =
+  | 'unscanned'
+  | 'auto_cleared'
+  | 'flagged_for_review'
+  | 'quarantined_blocked'
+  | 'manually_approved'
+  | 'manually_rejected';
+
+export const FRAUD_REVIEW_STATUSES: readonly FraudReviewStatus[] = [
+  'unscanned',
+  'auto_cleared',
+  'flagged_for_review',
+  'quarantined_blocked',
+  'manually_approved',
+  'manually_rejected'
+] as const;
+
+export type FraudSignalCategory =
+  | 'payout_collision'
+  | 'velocity_device'
+  | 'behavioral_bot'
+  | 'identity_domain';
+
+export const FRAUD_SIGNAL_CATEGORIES: readonly FraudSignalCategory[] = [
+  'payout_collision',
+  'velocity_device',
+  'behavioral_bot',
+  'identity_domain'
+] as const;
+
+export interface IFraudSignal {
+  code: string;
+  category: FraudSignalCategory;
+  severity: FraudRiskTier;
+  scoreContribution: number;
+  description: string;
+  detectedAt?: Date;
+}
+
+export interface IPortalSessionMetrics {
+  dwellTimeMs?: number;
+  interactionCount?: number;
+  keystrokeCount?: number;
+  webdriverDetected?: boolean;
+  timezoneOffset?: number;
+  screenResolution?: string;
+}
+
 export interface IClaimant extends Document {
   caseId: mongoose.Types.ObjectId | string;
   claimId: string;
@@ -107,6 +164,18 @@ export interface IClaimant extends Document {
   rejectionReason?: string;
   failureCode?: string;
   requeuedAt?: Date;
+  // JurisShield™ Multi-Tenant Fraud Monitoring & Claimant Scoring
+  fraudScore?: number;
+  fraudRiskTier?: FraudRiskTier;
+  fraudReviewStatus?: FraudReviewStatus;
+  fraudSignals?: IFraudSignal[];
+  fraudScannedAt?: Date;
+  fraudReviewedBy?: string;
+  fraudReviewedAt?: Date;
+  fraudReviewNotes?: string;
+  deviceFingerprintHash?: string;
+  payoutEndpointHash?: string;
+  portalSessionMetrics?: IPortalSessionMetrics;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -117,6 +186,49 @@ const AddressSchema = new Schema<IClaimantAddress>(
     city: { type: String, default: '', trim: true },
     state: { type: String, default: '', trim: true },
     zip: { type: String, default: '', trim: true }
+  },
+  { _id: false }
+);
+
+const FraudSignalSchema = new Schema<IFraudSignal>(
+  {
+    code: { type: String, required: [true, 'Signal code is required'], trim: true },
+    category: {
+      type: String,
+      enum: {
+        values: FRAUD_SIGNAL_CATEGORIES,
+        message: 'Invalid fraud signal category: {VALUE}'
+      },
+      required: [true, 'Signal category is required']
+    },
+    severity: {
+      type: String,
+      enum: {
+        values: FRAUD_RISK_TIERS,
+        message: 'Invalid fraud signal severity: {VALUE}'
+      },
+      required: [true, 'Signal severity is required']
+    },
+    scoreContribution: {
+      type: Number,
+      required: [true, 'Score contribution is required'],
+      min: [0, 'Score contribution cannot be negative'],
+      max: [100, 'Score contribution cannot exceed 100']
+    },
+    description: { type: String, required: [true, 'Signal description is required'], trim: true },
+    detectedAt: { type: Date, default: Date.now }
+  },
+  { _id: false }
+);
+
+const PortalSessionMetricsSchema = new Schema<IPortalSessionMetrics>(
+  {
+    dwellTimeMs: { type: Number, min: 0 },
+    interactionCount: { type: Number, min: 0 },
+    keystrokeCount: { type: Number, min: 0 },
+    webdriverDetected: { type: Boolean, default: false },
+    timezoneOffset: { type: Number },
+    screenResolution: { type: String, trim: true }
   },
   { _id: false }
 );
@@ -319,6 +431,65 @@ const ClaimantSchema = new Schema<IClaimant>(
     },
     requeuedAt: {
       type: Date
+    },
+    // JurisShield™ Multi-Tenant Fraud Monitoring & Claimant Scoring
+    fraudScore: {
+      type: Number,
+      default: 0,
+      min: [0, 'Fraud score cannot be less than 0'],
+      max: [100, 'Fraud score cannot exceed 100'],
+      index: true
+    },
+    fraudRiskTier: {
+      type: String,
+      enum: {
+        values: FRAUD_RISK_TIERS,
+        message: 'Invalid fraud risk tier: {VALUE}'
+      },
+      default: 'low',
+      index: true
+    },
+    fraudReviewStatus: {
+      type: String,
+      enum: {
+        values: FRAUD_REVIEW_STATUSES,
+        message: 'Invalid fraud review status: {VALUE}'
+      },
+      default: 'unscanned',
+      index: true
+    },
+    fraudSignals: {
+      type: [FraudSignalSchema],
+      default: []
+    },
+    fraudScannedAt: {
+      type: Date
+    },
+    fraudReviewedBy: {
+      type: String,
+      trim: true
+    },
+    fraudReviewedAt: {
+      type: Date
+    },
+    fraudReviewNotes: {
+      type: String,
+      trim: true
+    },
+    deviceFingerprintHash: {
+      type: String,
+      trim: true,
+      sparse: true,
+      index: true
+    },
+    payoutEndpointHash: {
+      type: String,
+      trim: true,
+      sparse: true,
+      index: true
+    },
+    portalSessionMetrics: {
+      type: PortalSessionMetricsSchema
     }
   },
   {
@@ -342,6 +513,8 @@ const ClaimantSchema = new Schema<IClaimant>(
 
 // Compound unique index: claimId must be unique within a case
 ClaimantSchema.index({ caseId: 1, claimId: 1 }, { unique: true });
+ClaimantSchema.index({ caseId: 1, fraudScore: -1 });
+ClaimantSchema.index({ caseId: 1, fraudRiskTier: 1, fraudReviewStatus: 1 });
 
 // Virtual getter and setter for claimantToken alias
 ClaimantSchema.virtual('claimantToken')
