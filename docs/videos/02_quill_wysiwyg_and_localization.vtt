@@ -1,0 +1,9 @@
+WEBVTT
+
+1
+00:00:00.050 --> 00:00:10.165
+In Flow 2 of the JurisBanking settlement platform, claims administrators open the Quill WYSIWYG template designer to author court-approved legal disclosures.
+
+2
+00:00:10.165 --> 00:00:29.642
+Dynamic merge tags inject claimant names, exact award amounts, and cryptographic magic links with strict server-side HTML sanitization, while live localization tabs switch seamlessly across English, Spanish, Chinese Simplified, and Vietnamese across desktop and mobile viewports.

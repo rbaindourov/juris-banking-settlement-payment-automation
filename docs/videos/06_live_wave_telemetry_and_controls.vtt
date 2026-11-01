@@ -1,0 +1,13 @@
+WEBVTT
+
+1
+00:00:00.050 --> 00:00:08.596
+In Flow 6 of JurisBanking, platform operators command the Live Rolling Wave Telemetry Funnel and operational wave controls.
+
+2
+00:00:08.596 --> 00:00:20.625
+Each wave card displays real-time sub-batch progress bars and eight atomic delivery counters tracking eligible, queued, dispatched, skipped, suppressed, and opened notices.
+
+3
+00:00:20.625 --> 00:00:32.716
+Operators can pause an active wave, resume and re-index remaining sub-batches, or reschedule future waves through WAI-ARIA dialogs requiring mandatory judicial docket justification.

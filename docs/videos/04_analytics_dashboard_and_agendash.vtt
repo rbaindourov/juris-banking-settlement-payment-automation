@@ -1,0 +1,9 @@
+WEBVTT
+
+1
+00:00:00.050 --> 00:00:11.237
+In Flow 4 of JurisBanking, managing partners and settlement auditors monitor the real-time Analytics Dashboard, NACHA Exception Ledger, and Agendash job orchestrator.
+
+2
+00:00:11.237 --> 00:00:33.839
+The console tracks live conversion across every stage of the disbursement funnel, breaks down claimant rail elections, flags NACHA R01 and R03 banking return exceptions for one-click fallback check remediation, and supervises native MongoDB-backed Agenda jobs for Dash Solutions SFTP batch transmissions.

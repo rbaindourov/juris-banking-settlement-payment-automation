@@ -1,0 +1,9 @@
+WEBVTT
+
+1
+00:00:00.050 --> 00:00:07.844
+Flow 5 demonstrates the JurisBanking Multi-Stage Settlement Cadence and Rolling Batch Throttling Designer.
+
+2
+00:00:07.844 --> 00:00:29.604
+Deliverability engineers configure five deterministic notification waves synchronized to the court disbursement deadline, customize four-language stage templates, tune sub-batch chunk pacing with overnight quiet-hours blackouts, and audit the three-layer pre-dispatch recipient eligibility bar that automatically bypasses completed and suppressed claimants.
